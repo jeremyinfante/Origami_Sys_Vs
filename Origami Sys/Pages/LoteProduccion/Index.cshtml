@@ -1,157 +1,181 @@
 ﻿@page
 @model Origami_Sys.Pages.LoteProduccion.IndexModel
 @{
-    ViewData["Title"] = "Historial de Lotes";
+    ViewData["Title"] = "Lotes de Producción";
     ViewData["Modulo"] = "Inventario";
 }
 
 <style>
-    :root {
-        --g-dark: #1a4332;
-        --g-bright: #10b981;
-        --danger: #be123c;
-        --border: #e5e7eb;
-        --text: #1f2937;
-        --muted: #6b7280;
-        --bg: #f9fafb;
-    }
-
-    /* ── Toolbar (Estilo Producto) ── */
-    .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: white; border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
-    .search-wrap { position: relative; flex: 1; min-width: 200px; }
-    .search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
-    .search-wrap input { width: 100%; padding: 7px 12px 7px 34px; border: 1px solid var(--border); border-radius: 7px; font-size: 13px; outline: none; transition: all .15s; }
-    .search-wrap input:focus { border-color: var(--g-bright); box-shadow: 0 0 0 3px rgba(16,185,129,.1); }
-    .toolbar select, .toolbar input[type="date"] { padding: 7px 10px; border: 1px solid var(--border); border-radius: 7px; font-size: 13px; color: var(--text); background: white; outline: none; }
-    .toolbar select:focus, .toolbar input[type="date"]:focus { border-color: var(--g-bright); box-shadow: 0 0 0 3px rgba(16,185,129,.1); }
-    
-    .btn-nuevo { display: inline-flex; align-items: center; gap: 6px; background: var(--g-dark); color: white; border: none; padding: 7px 16px; border-radius: 7px; font-size: 13px; font-weight: 600; text-decoration: none; transition: all .15s; }
-    .btn-nuevo:hover { background: #2d5a3d; color: white; transform: translateY(-1px); }
-
-    /* ── Tabla y Badges ── */
-    .tabla-wrap { background: white; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
-    .tabla-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    .tabla-wrap thead th { background: var(--bg); padding: 10px 14px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); }
-    .tabla-wrap tbody tr { border-bottom: 1px solid #f3f4f6; transition: background .1s; }
-    .tabla-wrap tbody tr:hover { background: #f0fdf4; }
-    .tabla-wrap td { padding: 10px 14px; color: var(--text); vertical-align: middle; }
-    
-    .cod-bold { font-weight: 700; color: var(--g-dark); font-size: 13.5px;}
-    .badge-insumo { background: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px; display: inline-block; margin: 2px; }
-    .badge-producto { background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px; display: inline-block; margin: 2px; }
-
-    /* ── Acciones ── */
-    .btn-ac { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 5px 10px; border-radius: 6px; text-decoration: none; transition: all .15s; border: none; cursor: pointer; }
-    .btn-ac:hover { opacity: .8; transform: translateY(-1px); }
-    .ac-del { background: #fef2f2; color: #be123c; border: 1px solid #fecdd3; }
-
-    /* ── Contador y Empty State ── */
-    .result-count { font-size: 12px; color: var(--muted); margin-bottom: 8px; padding-left: 2px; }
-    .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); }
+    :root{--g-dark:#1a4332;--g-bright:#10b981;--danger:#be123c;--border:#e5e7eb;--text:#1f2937;--muted:#6b7280;--bg:#f9fafb;}
+    .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:white;border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+    .search-wrap{position:relative;flex:1;min-width:180px;}
+    .search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;}
+    .search-wrap input{width:100%;padding:7px 12px 7px 34px;border:1px solid var(--border);border-radius:7px;font-size:13px;outline:none;transition:border-color .15s,box-shadow .15s;}
+    .search-wrap input:focus{border-color:var(--g-bright);box-shadow:0 0 0 3px rgba(16,185,129,.1);}
+    .toolbar select{padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px;color:var(--text);background:white;cursor:pointer;outline:none;}
+    .toolbar select:focus{border-color:var(--g-bright);box-shadow:0 0 0 3px rgba(16,185,129,.1);}
+    .btn-nuevo{display:inline-flex;align-items:center;gap:6px;background:var(--g-dark);color:white;border:none;padding:7px 16px;border-radius:7px;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap;transition:background .15s,transform .1s;}
+    .btn-nuevo:hover{background:#2d5a3d;color:white;transform:translateY(-1px);}
+    .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+    .stat-card{background:white;border:1px solid var(--border);border-radius:10px;padding:14px 18px;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+    .stat-label{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;}
+    .stat-value{font-size:20px;font-weight:700;color:var(--g-dark);}
+    .tabla-wrap{background:white;border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+    .tabla-wrap table{width:100%;border-collapse:collapse;font-size:13px;}
+    .tabla-wrap thead th{background:var(--bg);padding:10px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap;}
+    .tabla-wrap tbody tr{border-bottom:1px solid #f3f4f6;transition:background .1s;}
+    .tabla-wrap tbody tr:last-child{border-bottom:none;}
+    .tabla-wrap tbody tr:hover{background:#f0fdf4;}
+    .tabla-wrap td{padding:10px 14px;color:var(--text);vertical-align:middle;}
+    .lote-num{font-family:monospace;font-weight:700;color:var(--g-dark);font-size:13px;}
+    .fecha-txt{font-size:12px;color:var(--muted);font-family:monospace;}
+    .chip-mp{display:inline-flex;align-items:center;gap:4px;background:#fff7ed;color:#b45309;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;margin:2px;}
+    .chip-prod{display:inline-flex;align-items:center;gap:4px;background:#ecfdf5;color:#166534;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;margin:2px;}
+    .acciones{display:flex;gap:5px;}
+    .btn-ac{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:5px;text-decoration:none;transition:opacity .15s,transform .1s;border:none;cursor:pointer;}
+    .btn-ac:hover{opacity:.8;transform:translateY(-1px);}
+    .ac-anular{background:#fde8e8;color:#c81e1e;}
+    .result-count{font-size:12px;color:var(--muted);margin-bottom:8px;padding-left:2px;}
+    .empty-state{text-align:center;padding:48px 20px;color:var(--muted);}
+    .empty-state p{font-size:14px;margin:0;}
+    .obs-txt{font-size:12px;color:var(--muted);max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 </style>
+
+<!-- Stats -->
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-label">Total lotes</div>
+        <div class="stat-value">@Model.Lotes.Count</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Productos generados</div>
+        <div class="stat-value" style="color:var(--g-bright)">@Model.Lotes.Sum(l => l.Productos?.Sum(p => p.CantidadProducida) ?? 0)</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Lotes este mes</div>
+        <div class="stat-value">@Model.Lotes.Count(l => l.Fecha.Month == DateTime.Now.Month && l.Fecha.Year == DateTime.Now.Year)</div>
+    </div>
+</div>
 
 <!-- Toolbar -->
 <div class="toolbar">
     <div class="search-wrap">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" id="buscador" placeholder="Buscar por Lote u observación..." />
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" id="buscador" placeholder="Buscar por N° lote u observaciones..." autocomplete="off" />
     </div>
-    <input type="date" id="filtroFecha" />
-    <select id="filtroMP">
-        <option value="">Materias Primas</option>
-        @foreach (var mp in Model.MateriasPrimas) { <option value="@mp.Id">@mp.Nombre</option> }
+
+    <select id="filtroMes">
+        <option value="">Todos los meses</option>
+        @foreach (var mes in Model.Lotes.Select(l => l.Fecha.ToString("yyyy-MM")).Distinct().OrderByDescending(m => m))
+        {
+            var label = DateTime.ParseExact(mes, "yyyy-MM", null).ToString("MMMM yyyy");
+            <option value="@mes">@label</option>
+        }
     </select>
-    <select id="filtroProd">
-        <option value="">Productos</option>
-        @foreach (var p in Model.Productos) { <option value="@p.Id">@p.Nombre</option> }
-    </select>
+
     <select id="ordenar">
         <option value="">Ordenar por...</option>
-        <option value="fecha-desc">Fecha: Recientes</option>
-        <option value="cant-desc">Más cantidad</option>
+        <option value="fecha-desc">Más reciente</option>
+        <option value="fecha-asc">Más antigua</option>
+        <option value="lote-asc">N° Lote ↑</option>
+        <option value="lote-desc">N° Lote ↓</option>
     </select>
-    <a class="btn-nuevo" asp-page="Crear">+ Registrar Lote</a>
+
+    <a class="btn-nuevo" asp-page="Crear">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Registrar Lote
+    </a>
 </div>
 
 <div class="result-count" id="resultCount"></div>
 
-<!-- Tabla -->
 <div class="tabla-wrap">
-    <table id="tablaLotes">
+    <table>
         <thead>
             <tr>
                 <th>N° Lote</th>
                 <th>Fecha</th>
-                <th>Insumos Consumidos</th>
+                <th>Materias Consumidas</th>
                 <th>Productos Generados</th>
-                <th>Total Prod.</th>
+                <th>Observaciones</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody id="tbody">
             @foreach (var l in Model.Lotes)
             {
-                // Pre-calculamos datos para los data-attributes del JavaScript
-                var mpsIds = string.Join(",", l.Detalles.Select(d => d.MateriaPrimaId));
-                var prodsIds = string.Join(",", l.Productos.Select(p => p.ProductoId));
-                var cantTotal = l.Productos.Sum(p => p.CantidadProducida);
-
                 <tr data-lote="@l.NumeroLote.ToLower()"
                     data-obs="@(l.Observaciones?.ToLower() ?? "")"
-                    data-fecha="@l.Fecha.ToString("yyyy-MM-dd")"
-                    data-fechams="@(new DateTimeOffset(l.Fecha).ToUnixTimeMilliseconds())"
-                    data-mps="@mpsIds"
-                    data-prods="@prodsIds"
-                    data-cant="@cantTotal">
-                    
-                    <td>
-                        <span class="cod-bold">@l.NumeroLote</span><br/>
-                        <span style="font-size:10px;color:var(--muted)">@(l.Observaciones ?? "Sin observaciones")</span>
-                    </td>
-                    <td style="white-space:nowrap;">@l.Fecha.ToString("dd MMM yyyy")</td>
-                    <td>
-                        @foreach (var d in l.Detalles) {
-                            <span class="badge-insumo">@d.MateriaPrima?.Nombre (@d.CantidadUsada)</span>
+                    data-mes="@l.Fecha.ToString("yyyy-MM")"
+                    data-fecha="@l.Fecha.ToString("yyyyMMdd")">
+                    <td><span class="lote-num">@l.NumeroLote</span></td>
+                    <td><span class="fecha-txt">@l.Fecha.ToString("dd/MM/yyyy")</span></td>
+                    <td style="max-width:200px">
+                        @foreach (var d in l.Detalles)
+                        {
+                            <span class="chip-mp">
+                                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                                @d.MateriaPrima?.Nombre @d.CantidadUsada @d.MateriaPrima?.UnidadMedida
+                            </span>
                         }
                     </td>
-                    <td>
-                        @foreach (var p in l.Productos) {
-                            <span class="badge-producto">@p.Producto?.Nombre (+@p.CantidadProducida)</span>
+                    <td style="max-width:200px">
+                        @foreach (var p in l.Productos)
+                        {
+                            <span class="chip-prod">
+                                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+                                +@p.CantidadProducida @p.Producto?.Nombre
+                            </span>
                         }
                     </td>
-                    <td><strong>@cantTotal</strong> uds</td>
+                    <td><span class="obs-txt" title="@l.Observaciones">@(l.Observaciones ?? "—")</span></td>
                     <td>
-                        <button type="button" class="btn-ac ac-del" onclick="event.preventDefault(); abrirModalEliminar(@l.Id, '@l.NumeroLote')">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-                            Anular
-                        </button>
+                        <div class="acciones">
+                            <button type="button" class="btn-ac ac-anular" onclick="abrirModal(@l.Id, '@l.NumeroLote')">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                                Anular
+                            </button>
+                        </div>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
-
     <div class="empty-state" id="emptyState" style="display:none">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.3; margin-bottom:10px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <p style="margin:0;font-size:14px">No se encontraron lotes con los filtros aplicados.</p>
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:12px;display:block;margin-inline:auto">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <p>No se encontraron lotes de producción.</p>
     </div>
 </div>
 
-<div id="modalEliminar" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; padding:20px;">
-    <div style="background:white; border-radius:12px; width:100%; max-width:420px; overflow:hidden; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1); animation: slideUp 0.2s ease-out;">
-        <div style="background:var(--danger); padding:16px 20px; display:flex; align-items:center; gap:12px;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            <span style="color:white; font-weight:700; font-size:15px;">Confirmar eliminación</span>
+<!-- Modal anular -->
+<div id="modalAnular" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center;">
+    <div style="background:white;border-radius:14px;width:100%;max-width:420px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.2);">
+        <div style="background:#be123c;padding:16px 20px;display:flex;align-items:center;gap:10px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <div style="color:white;font-weight:700;font-size:14px;">Anular Lote de Producción</div>
         </div>
-        <div style="padding:24px;">
-            <p style="margin:0 0 20px 0; font-size:14px; color:#4b5563; line-height:1.5;">
-                ¿Eliminar lote <strong id="loteNombre"></strong>? Esta acción no se puede deshacer y revertirá el stock.
+        <div style="padding:20px;">
+            <p style="font-size:13px;color:#374151;margin:0 0 10px 0;">
+                ¿Anular el lote <strong id="modalLote"></strong>?
             </p>
-            <div style="display:flex; justify-content:flex-end; gap:10px;">
-                <button onclick="cerrarModal()" style="padding:8px 16px; border:1px solid #d1d5db; border-radius:8px; background:white; color:#374151; font-size:13px; font-weight:600; cursor:pointer;">Cancelar</button>
-                <form method="post" asp-page-handler="Eliminar">
-                    <input type="hidden" name="id" id="loteId" />
-                    <button type="submit" style="padding:8px 16px; border:none; border-radius:8px; background:var(--danger); color:white; font-size:13px; font-weight:600; cursor:pointer;">Eliminar</button>
+            <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:12px;color:#991b1b;margin-bottom:16px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                Se revertirá el consumo de materias primas y se descontará el stock de los productos generados.
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;">
+                <button onclick="cerrarModal()" style="background:white;border:1px solid #e5e7eb;color:#6b7280;padding:7px 16px;border-radius:7px;font-size:12px;cursor:pointer;">Cancelar</button>
+                <form method="post" asp-page-handler="Eliminar" id="formAnular" style="margin:0;">
+                    <input type="hidden" name="id" id="modalId" />
+                    <button type="submit" style="background:#be123c;color:white;border:none;padding:7px 16px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;">Confirmar Anulación</button>
                 </form>
             </div>
         </div>
@@ -162,71 +186,57 @@
 <script>
     const filas = () => [...document.querySelectorAll('#tbody tr')];
 
-    function aplicarFiltros() {
-        const q = document.getElementById('buscador').value.toLowerCase().trim();
-        const fecha = document.getElementById('filtroFecha').value;
-        const mpId = document.getElementById('filtroMP').value;
-        const prodId = document.getElementById('filtroProd').value;
+    function aplicar() {
+        const q     = document.getElementById('buscador').value.toLowerCase().trim();
+        const mes   = document.getElementById('filtroMes').value;
         const orden = document.getElementById('ordenar').value;
 
         let visibles = filas().filter(tr => {
-            const matchQ = !q || tr.dataset.lote.includes(q) || tr.dataset.obs.includes(q);
-            const matchFecha = !fecha || tr.dataset.fecha === fecha;
-            const matchMp = !mpId || tr.dataset.mps.split(',').includes(mpId);
-            const matchProd = !prodId || tr.dataset.prods.split(',').includes(prodId);
-            return matchQ && matchFecha && matchMp && matchProd;
+            const matchQ   = !q   || tr.dataset.lote.includes(q) || tr.dataset.obs.includes(q);
+            const matchMes = !mes || tr.dataset.mes === mes;
+            return matchQ && matchMes;
         });
 
         filas().forEach(tr => tr.style.display = 'none');
 
         if (orden) {
+            const [campo, dir] = orden.split('-');
             visibles.sort((a, b) => {
-                if (orden.startsWith('fecha')) {
-                    const fA = parseInt(a.dataset.fechams);
-                    const fB = parseInt(b.dataset.fechams);
-                    return orden.endsWith('asc') ? fA - fB : fB - fA;
-                } else if (orden.startsWith('cant')) {
-                    const cA = parseInt(a.dataset.cant);
-                    const cB = parseInt(b.dataset.cant);
-                    return orden.endsWith('asc') ? cA - cB : cB - cA;
-                }
-                return 0;
+                let va = campo === 'fecha' ? a.dataset.fecha : a.dataset.lote;
+                let vb = campo === 'fecha' ? b.dataset.fecha : b.dataset.lote;
+                return dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
             });
             const tbody = document.getElementById('tbody');
             visibles.forEach(tr => tbody.appendChild(tr));
         }
 
         visibles.forEach(tr => tr.style.display = '');
+        document.getElementById('emptyState').style.display = visibles.length === 0 ? '' : 'none';
 
-        document.getElementById('emptyState').style.display = visibles.length === 0 ? 'block' : 'none';
         const total = filas().length;
-        document.getElementById('resultCount').textContent = visibles.length === total 
-            ? `${total} lote(s) registrados` 
-            : `Mostrando ${visibles.length} de ${total} lote(s)`;
+        document.getElementById('resultCount').textContent =
+            visibles.length === total ? `${total} lote(s)` : `Mostrando ${visibles.length} de ${total} lote(s)`;
     }
 
-    // Inicializar eventos
-    ['buscador', 'filtroFecha', 'filtroMP', 'filtroProd', 'ordenar'].forEach(id => {
-        document.getElementById(id).addEventListener('input', aplicarFiltros);
-    });
+    ['buscador','filtroMes','ordenar'].forEach(id =>
+        document.getElementById(id).addEventListener('input', aplicar)
+    );
 
-    // Funciones del Modal
-    function abrirModalEliminar(id, nombre) {
-        document.getElementById('loteId').value = id;
-        document.getElementById('loteNombre').innerText = nombre;
-        document.getElementById('modalEliminar').style.display = 'flex';
+    const modal = document.getElementById('modalAnular');
+
+    function abrirModal(id, lote) {
+        document.getElementById('modalLote').textContent = lote;
+        document.getElementById('modalId').value = id;
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
     }
-
-    function cerrarModal() { 
-        document.getElementById('modalEliminar').style.display = 'none'; 
+    function cerrarModal() {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
     }
+    modal.addEventListener('mousedown', e => { if (e.target === modal) cerrarModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarModal(); });
 
-    // Cerrar al hacer clic fuera del cuadro blanco
-    document.getElementById('modalEliminar').addEventListener('mousedown', e => { 
-        if (e.target.id === 'modalEliminar') cerrarModal(); 
-    });
-
-    // Ejecución inicial
-    aplicarFiltros();
+    aplicar();
 </script>
 }
