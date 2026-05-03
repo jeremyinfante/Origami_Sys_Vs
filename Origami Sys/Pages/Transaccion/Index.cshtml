@@ -5,90 +5,201 @@
     ViewData["Modulo"] = "Financiero";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="mb-0">Ingresos / Egresos</h5>
-    <a class="btn btn-sm btn-success" asp-page="Crear">+ Nueva Transacción</a>
+<style>
+    :root {
+        --g-dark: #1a4332;
+        --g-bright: #10b981;
+        --danger: #be123c;
+        --border: #e5e7eb;
+        --text: #1f2937;
+        --muted: #6b7280;
+    }
+
+    /* ── Resumen Bento (Suavizado) ── */
+    .resumen-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+    .card-bento { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+    /* Eliminadas las negritas pesadas por preferencia del usuario */
+    .card-bento p { font-size: 11px; font-weight: 500; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .card-bento h4 { font-size: 20px; font-weight: 500; margin: 0; color: var(--text); }
+    .val-ingreso { color: var(--g-bright) !important; }
+    .val-egreso { color: var(--danger) !important; }
+
+    /* ── Toolbar ── */
+    .toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: nowrap; background: white; border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; margin-bottom: 16px; }
+    .search-wrap { position: relative; flex: 2; min-width: 200px; }
+    .search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+    .search-wrap input { width: 100%; padding: 7px 10px 7px 32px; border: 1px solid var(--border); border-radius: 7px; font-size: 13px; outline: none; }
+    .toolbar select { flex: 1; padding: 7px 10px; border: 1px solid var(--border); border-radius: 7px; font-size: 13px; background: white; }
+
+    .btn-nuevo { background: var(--g-dark); color: white; padding: 8px 16px; border-radius: 7px; font-size: 13px; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+
+    /* ── Tabla ── */
+    .tabla-wrap { background: white; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { background: #f9fafb; padding: 12px; text-align: left; color: var(--muted); font-size: 11px; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+    td { padding: 12px; border-bottom: 1px solid #f3f4f6; }
+    
+    /* ── Botones de Acción con Texto ── */
+    .actions-cell { display: flex; gap: 8px; justify-content: flex-end; }
+    .btn-action { padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; text-decoration: none; border: 1px solid transparent; cursor: pointer; transition: 0.2s; }
+    .ac-edit { background: #e8f0fe; color: #1a56db; }
+    .ac-edit:hover { background: #e5e7eb; }
+    .ac-del { background: #fde8e8; color: #c81e1e; }
+    .ac-del:hover { background: #fee2e2; }
+
+    .badge-t { padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+    .bg-ingreso { background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; }
+    .bg-egreso { background: #fef2f2; color: #be123c; border: 1px solid #fecdd3; }
+</style>
+
+<div class="resumen-grid">
+    <div class="card-bento">
+        <p>Total Ingresos</p>
+        <h4 class="val-ingreso">@Model.TotalIngresos.ToString("C")</h4>
+    </div>
+    <div class="card-bento">
+        <p>Total Egresos</p>
+        <h4 class="val-egreso">@Model.TotalEgresos.ToString("C")</h4>
+    </div>
+    <div class="card-bento">
+        <p>Flujo de Caja</p>
+        <h4 class="@(Model.FlujoCaja >= 0 ? "val-ingreso" : "val-egreso")">@Model.FlujoCaja.ToString("C")</h4>
+    </div>
 </div>
 
-<!-- Resumen rápido -->
-<div class="row g-3 mb-4">
-    <div class="col-md-4">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
-                <p class="text-muted small mb-1">Total Ingresos</p>
-                <h4 class="text-success mb-0">@Model.TotalIngresos.ToString("C")</h4>
-            </div>
-        </div>
+<div class="toolbar">
+    <div class="search-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="buscador" placeholder="Buscar por descripción..." autocomplete="off" />
     </div>
-    <div class="col-md-4">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
-                <p class="text-muted small mb-1">Total Egresos</p>
-                <h4 class="text-danger mb-0">@Model.TotalEgresos.ToString("C")</h4>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
-                <p class="text-muted small mb-1">Flujo de Caja</p>
-                <h4 class="@(Model.FlujoCaja >= 0 ? "text-success" : "text-danger") mb-0">
-                    @Model.FlujoCaja.ToString("C")
-                </h4>
-            </div>
-        </div>
-    </div>
+
+    <select id="filtroTipo">
+        <option value="">Todos los tipos</option>
+        <option value="Ingreso">Ingresos</option>
+        <option value="Egreso">Egresos</option>
+    </select>
+
+    <select id="ordenar">
+        <option value="recientes">Más recientes</option>
+        <option value="monto-desc">Monto: Mayor a menor</option>
+        <option value="monto-asc">Monto: Menor a mayor</option>
+    </select>
+
+    <a class="btn-nuevo" asp-page="Crear">+ Nueva Transacción</a>
 </div>
 
-<!-- Filtro por tipo -->
-<div class="mb-3 d-flex gap-2">
-    <a asp-page="Index" class="btn btn-sm @(Model.Filtro == "" ? "btn-dark" : "btn-outline-secondary")">
-        Todos
-    </a>
-    <a asp-page="Index" asp-route-filtro="Ingreso"
-           class="btn btn-sm @(Model.Filtro == "Ingreso" ? "btn-success" : "btn-outline-success")">
-        Ingresos
-    </a>
-    <a asp-page="Index" asp-route-filtro="Egreso"
-           class="btn btn-sm @(Model.Filtro == "Egreso" ? "btn-danger" : "btn-outline-danger")">
-        Egresos
-    </a>
-</div>
-
-<table class="table table-sm table-striped">
-    <thead>
-        <tr>
-            <th>Fecha</th>
-            <th>Descripción</th>
-            <th>Tipo</th>
-            <th>Monto</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var t in Model.Transacciones)
-        {
+<div class="tabla-wrap">
+    <table>
+        <thead>
             <tr>
-                <td>@t.Fecha.ToString("dd/MM/yyyy")</td>
-                <td>@t.Descripcion</td>
-                <td>
-                    @if (t.Tipo == Origami_Sys.Modelos.TipoTransaccion.Ingreso)
-                    {
-                        <span class="badge bg-success">Ingreso</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-danger">Egreso</span>
-                    }
-                </td>
-                <td class="@(t.Tipo == Origami_Sys.Modelos.TipoTransaccion.Ingreso ? "text-success" : "text-danger")">
-                    @t.Monto.ToString("C")
-                </td>
-                <td>
-                    <a class="btn btn-secondary btn-sm" asp-page="Editar" asp-route-id="@t.Id">Editar</a>
-                    <a class="btn btn-danger btn-sm" asp-page="Borrar" asp-route-id="@t.Id">Eliminar</a>
-                </td>
+                <th>Fecha</th>
+                <th>Descripción</th>
+                <th>Tipo</th>
+                <th>Monto</th>
+                <th style="text-align:right">Acciones</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody id="tbody">
+            @foreach (var t in Model.Transacciones)
+            {
+                <tr data-desc="@t.Descripcion.ToLower()" 
+                    data-tipo="@t.Tipo" 
+                    data-monto="@t.Monto.ToString().Replace(",", ".")" 
+                    data-fechams="@(new DateTimeOffset(t.Fecha).ToUnixTimeMilliseconds())">
+                    <td>@t.Fecha.ToString("dd MMM yyyy")</td>
+                    <td><span style="font-weight:500">@t.Descripcion</span></td>
+                    <td>
+                        <span class="badge-t @(t.Tipo == Origami_Sys.Modelos.TipoTransaccion.Ingreso ? "bg-ingreso" : "bg-egreso")">
+                            @t.Tipo
+                        </span>
+                    </td>
+                    <td style="font-weight:700" class="@(t.Tipo == Origami_Sys.Modelos.TipoTransaccion.Ingreso ? "val-ingreso" : "val-egreso")">
+                        @t.Monto.ToString("C")
+                    </td>
+                    <td class="actions-cell">
+                        <a asp-page="Editar" asp-route-id="@t.Id" class="btn-action ac-edit">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                    Editar
+                        </a>
+
+                        <button type="button" class="btn-action ac-del" onclick="abrirModalEliminar(@t.Id, '@t.Descripcion')">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                                    Eliminar
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal -->
+<div id="modalEliminar" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:white; border-radius:12px; width:100%; max-width:400px; overflow:hidden; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);">
+        <div style="background:var(--danger); padding:16px 20px; display:flex; align-items:center; gap:12px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span style="color:white; font-weight:700; font-size:15px;">Confirmar eliminación</span>
+        </div>
+        <div style="padding:24px;">
+            <p style="margin:0 0 20px 0; font-size:14px; color:#4b5563; line-height:1.5;">
+                ¿Estás seguro de eliminar la transacción <strong><span id="delNombre"></span></strong>?
+            </p>
+            <div style="display:flex; justify-content:flex-end; gap:10px;">
+                <button onclick="cerrarModal()" style="padding:8px 16px; border:1px solid #d1d5db; border-radius:8px; background:white; color:#374151; font-size:13px; font-weight:600; cursor:pointer;">Cancelar</button>
+                <form method="post" asp-page-handler="Eliminar">
+                    <input type="hidden" name="id" id="delId" />
+                    <button type="submit" style="padding:8px 16px; border:none; border-radius:8px; background:var(--danger); color:white; font-size:13px; font-weight:600; cursor:pointer;">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const getFilas = () => [...document.querySelectorAll('#tbody tr')];
+
+    function aplicarFiltros() {
+        const q = document.getElementById('buscador').value.toLowerCase();
+        const tipo = document.getElementById('filtroTipo').value;
+        const orden = document.getElementById('ordenar').value;
+        
+        let visibles = getFilas().filter(tr => {
+            const mQ = !q || tr.dataset.desc.includes(q);
+            const mT = !tipo || tr.dataset.tipo === tipo;
+            return mQ && mT;
+        });
+
+        // Ocultar todos
+        getFilas().forEach(tr => tr.style.display = 'none');
+
+        // Lógica de Ordenamiento (FIX)
+        visibles.sort((a, b) => {
+            if (orden === 'monto-desc') return parseFloat(b.dataset.monto) - parseFloat(a.dataset.monto);
+            if (orden === 'monto-asc') return parseFloat(a.dataset.monto) - parseFloat(b.dataset.monto);
+            if (orden === 'recientes') return parseInt(b.dataset.fechams) - parseInt(a.dataset.fechams);
+            return 0;
+        });
+
+        // Re-inyectar en orden y mostrar
+        const tbody = document.getElementById('tbody');
+        visibles.forEach(tr => {
+            tbody.appendChild(tr);
+            tr.style.display = '';
+        });
+    }
+
+    // Eventos
+    document.getElementById('buscador').addEventListener('input', aplicarFiltros);
+    document.getElementById('filtroTipo').addEventListener('change', aplicarFiltros);
+    document.getElementById('ordenar').addEventListener('change', aplicarFiltros);
+
+    function abrirModalEliminar(id, nombre) {
+        document.getElementById('delId').value = id;
+        document.getElementById('delNombre').innerText = nombre;
+        document.getElementById('modalEliminar').style.display = 'flex';
+    }
+
+    function cerrarModal() { document.getElementById('modalEliminar').style.display = 'none'; }
+</script>
+}
