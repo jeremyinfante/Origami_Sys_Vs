@@ -1,0 +1,94 @@
+﻿@page
+@model Origami_Sys.Pages.Transaccion.IndexModel
+@{
+    ViewData["Title"] = "Ingresos / Egresos";
+    ViewData["Modulo"] = "Financiero";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Ingresos / Egresos</h5>
+    <a class="btn btn-sm btn-success" asp-page="Crear">+ Nueva Transacción</a>
+</div>
+
+<!-- Resumen rápido -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <p class="text-muted small mb-1">Total Ingresos</p>
+                <h4 class="text-success mb-0">@Model.TotalIngresos.ToString("C")</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <p class="text-muted small mb-1">Total Egresos</p>
+                <h4 class="text-danger mb-0">@Model.TotalEgresos.ToString("C")</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <p class="text-muted small mb-1">Flujo de Caja</p>
+                <h4 class="@(Model.FlujoCaja >= 0 ? "text-success" : "text-danger") mb-0">
+                    @Model.FlujoCaja.ToString("C")
+                </h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filtro por tipo -->
+<div class="mb-3 d-flex gap-2">
+    <a asp-page="Index" class="btn btn-sm @(Model.Filtro == "" ? "btn-dark" : "btn-outline-secondary")">
+        Todos
+    </a>
+    <a asp-page="Index" asp-route-filtro="Ingreso"
+           class="btn btn-sm @(Model.Filtro == "Ingreso" ? "btn-success" : "btn-outline-success")">
+        Ingresos
+    </a>
+    <a asp-page="Index" asp-route-filtro="Egreso"
+           class="btn btn-sm @(Model.Filtro == "Egreso" ? "btn-danger" : "btn-outline-danger")">
+        Egresos
+    </a>
+</div>
+
+<table class="table table-sm table-striped">
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Descripción</th>
+            <th>Tipo</th>
+            <th>Monto</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var t in Model.Transacciones)
+        {
+            <tr>
+                <td>@t.Fecha.ToString("dd/MM/yyyy")</td>
+                <td>@t.Descripcion</td>
+                <td>
+                    @if (t.Tipo == Origami_Sys.Modelos.TipoTransaccion.Ingreso)
+                    {
+                        <span class="badge bg-success">Ingreso</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Egreso</span>
+                    }
+                </td>
+                <td class="@(t.Tipo == Origami_Sys.Modelos.TipoTransaccion.Ingreso ? "text-success" : "text-danger")">
+                    @t.Monto.ToString("C")
+                </td>
+                <td>
+                    <a class="btn btn-secondary btn-sm" asp-page="Editar" asp-route-id="@t.Id">Editar</a>
+                    <a class="btn btn-danger btn-sm" asp-page="Borrar" asp-route-id="@t.Id">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

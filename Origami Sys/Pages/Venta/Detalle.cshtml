@@ -1,0 +1,69 @@
+﻿@page "{id:int}"
+@model Origami_Sys.Pages.Venta.DetalleModel
+@{
+    ViewData["Title"] = "Detalle de Venta";
+    ViewData["Modulo"] = "Ventas";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Factura — @Model.Venta.NumeroFactura</h5>
+    <a asp-page="Index" class="btn btn-sm btn-outline-secondary">← Volver</a>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <p class="text-muted small mb-1">Cliente</p>
+                <p class="mb-2"><strong>@Model.Venta.ClienteNombre</strong></p>
+                <p class="text-muted small mb-1">Fecha</p>
+                <p class="mb-0">@Model.Venta.Fecha.ToString("dd/MM/yyyy HH:mm")</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <p class="text-muted small mb-1">Atendido por</p>
+                <p class="mb-2"><strong>@Model.Venta.Empleado?.Nombre @Model.Venta.Empleado?.Apellido</strong></p>
+                <p class="text-muted small mb-1">Total</p>
+                <h4 class="text-success mb-0">@Model.Venta.Total.ToString("C")</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white">
+        <strong class="small">Productos vendidos</strong>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unitario</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var d in Model.Venta.Detalles)
+                {
+                    <tr>
+                        <td>@d.Producto?.Nombre</td>
+                        <td>@d.Cantidad</td>
+                        <td>@d.PrecioUnitario.ToString("C")</td>
+                        <td>@d.Subtotal.ToString("C")</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" class="text-end fw-bold">Total:</td>
+                    <td class="text-success fw-bold">@Model.Venta.Total.ToString("C")</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>

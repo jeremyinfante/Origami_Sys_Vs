@@ -1,0 +1,27 @@
+﻿@page "{id:int}"
+@model Origami_Sys.Pages.CompraMateriaPrima.BorrarModel
+@{
+    ViewData["Title"] = "Anular Compra";
+    ViewData["Modulo"] = "Inventario";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Anular Compra</h5>
+    <a asp-page="Index" class="btn btn-sm btn-outline-secondary">← Volver</a>
+</div>
+
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+        <p class="text-danger">⚠ Esta acción anulará la compra y descontará el stock de la materia prima.</p>
+        <p><strong>Materia Prima:</strong> @Model.Compra.MateriaPrima?.Nombre</p>
+        <p><strong>Cantidad:</strong> @Model.Compra.Cantidad @Model.Compra.MateriaPrima?.UnidadMedida</p>
+        <p><strong>Costo:</strong> @Model.Compra.CostoTotal.ToString("C")</p>
+        <p><strong>Fecha:</strong> @Model.Compra.Fecha.ToString("dd/MM/yyyy")</p>
+    </div>
+</div>
+
+<form method="post">
+    <input type="hidden" asp-for="Compra.Id" />
+    <button type="submit" class="btn btn-danger">Anular Compra</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
+</form>

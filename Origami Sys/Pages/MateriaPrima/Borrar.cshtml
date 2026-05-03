@@ -1,0 +1,25 @@
+﻿@page "{id:int}"
+@model Origami_Sys.Pages.MateriaPrima.BorrarModel
+@{
+    ViewData["Title"] = "Eliminar Materia Prima";
+    ViewData["Modulo"] = "Inventario";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Eliminar Materia Prima</h5>
+    <a asp-page="Index" class="btn btn-sm btn-outline-secondary">← Volver</a>
+</div>
+
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+        <p>¿Está seguro de que desea eliminar esta materia prima?</p>
+        <p><strong>Nombre:</strong> @Model.MateriaPrima.Nombre</p>
+        <p><strong>Stock actual:</strong> @Model.MateriaPrima.StockActual @Model.MateriaPrima.UnidadMedida</p>
+    </div>
+</div>
+
+<form method="post">
+    <input type="hidden" asp-for="MateriaPrima.Id" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
+</form>

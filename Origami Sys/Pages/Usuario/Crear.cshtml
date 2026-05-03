@@ -1,0 +1,48 @@
+﻿@page
+@model Origami_Sys.Pages.Usuario.CrearModel
+@{
+    ViewData["Title"] = "Nuevo Usuario";
+    ViewData["Modulo"] = "RRHH";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Nuevo Usuario</h5>
+    <a asp-page="Index" class="btn btn-sm btn-outline-secondary">← Volver</a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <form method="post">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Usuario.Username" class="form-label">Username</label>
+                    <input asp-for="Usuario.Username" class="form-control" />
+                    <span asp-validation-for="Usuario.Username" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Usuario.Password" class="form-label">Contraseña</label>
+                    <input asp-for="Usuario.Password" type="password" class="form-control" />
+                    <span asp-validation-for="Usuario.Password" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Usuario.EmpleadoId" class="form-label">Empleado</label>
+                    <select asp-for="Usuario.EmpleadoId" asp-items="Model.EmpleadosSelect" class="form-select">
+                        <option value="">-- Seleccione --</option>
+                    </select>
+                    <span asp-validation-for="Usuario.EmpleadoId" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Usuario.RolId" class="form-label">Rol</label>
+                    <select asp-for="Usuario.RolId" asp-items="Model.RolesSelect" class="form-select">
+                        <option value="">-- Seleccione --</option>
+                    </select>
+                    <span asp-validation-for="Usuario.RolId" class="text-danger small"></span>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success">Guardar</button>
+            <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

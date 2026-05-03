@@ -1,0 +1,250 @@
+﻿@page
+@model Origami_Sys.Pages.Producto.CrearModel
+@{
+    ViewData["Title"] = "Nuevo Producto";
+    ViewData["Modulo"] = "Inventario";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --brand-green: #1a4332;
+        --brand-green-bright: #10b981;
+        --brand-green-light: #f0fdf4;
+        --border-color: #e5e7eb;
+        --text-main: #1f2937;
+        --text-muted: #6b7280;
+        --bg-body: #f3f4f6;
+    }
+
+    body {
+        background-color: var(--bg-body);
+        font-family: 'Inter', sans-serif;
+        color: var(--text-main);
+        font-size: 14px;
+    }
+
+    .main-wrapper-fluid {
+        width: 100%;
+        padding: 1.5rem 2rem;
+    }
+
+    /* Header */
+    .header-minimal {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+        .header-minimal h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--brand-green);
+            letter-spacing: -0.02em;
+        }
+
+    .breadcrumb-text {
+        font-size: 11px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+    }
+
+    /* Tarjeta Principal */
+    .card-clean {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Seccionado */
+    .form-section-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--brand-green-bright);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin: 1.5rem 0 1rem 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .form-section-label::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #f1f5f9;
+        }
+
+    .form-label {
+        font-weight: 500;
+        font-size: 13px;
+        margin-bottom: 6px;
+        color: #374151;
+    }
+
+    .form-control, .form-select {
+        font-size: 14px;
+        padding: 0.6rem 0.8rem;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        transition: all 0.2s ease;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--brand-green-bright);
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+            outline: none;
+        }
+
+    /* Cajas de Stock */
+    .stock-box {
+        background-color: #fafafa;
+        border-radius: 10px;
+        padding: 1.25rem;
+        border: 1px solid #f1f5f9;
+    }
+
+    /* Botones */
+    .btn-save {
+        background-color: var(--brand-green-bright);
+        color: white;
+        border: none;
+        padding: 0.6rem 2rem;
+        font-size: 14px;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .btn-save:hover {
+            background-color: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+            color: white;
+        }
+
+    .btn-cancel {
+        background-color: #fff;
+        color: var(--text-muted);
+        border: 1px solid var(--border-color);
+        padding: 0.6rem 1.5rem;
+        font-size: 14px;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+
+        .btn-cancel:hover {
+            background-color: #f9fafb;
+            border-color: #d1d5db;
+            color: var(--text-main);
+        }
+</style>
+
+<div class="main-wrapper-fluid">
+    <!-- Header -->
+    <div class="header-minimal">
+        <div>
+            <div class="breadcrumb-text">@ViewData["Modulo"] / Catálogo</div>
+            <h1>Registrar Nuevo Producto</h1>
+        </div>
+        <a asp-page="Index" class="btn-cancel text-decoration-none d-flex align-items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+            Volver al listado
+        </a>
+    </div>
+
+    <!-- Card Formulario -->
+    <div class="card-clean">
+        <div class="card-body p-4 p-lg-5">
+            <form method="post">
+
+                <!-- SECCIÓN 1: IDENTIFICACIÓN -->
+                <div class="form-section-label">Identificación Básica</div>
+                <div class="row g-4 mb-4">
+                    <div class="col-xl-3 col-md-4">
+                        <label asp-for="Producto.CodigoBarra" class="form-label">Código de Barra</label>
+                        <input asp-for="Producto.CodigoBarra" class="form-control" placeholder="Ej: H8734H" />
+                    </div>
+                    <div class="col-xl-6 col-md-5">
+                        <label asp-for="Producto.Nombre" class="form-label">Nombre del Producto <span class="text-danger">*</span></label>
+                        <input asp-for="Producto.Nombre" class="form-control" placeholder="Ej: Jabón de Lavanda" />
+                        <span asp-validation-for="Producto.Nombre" class="text-danger" style="font-size:11px"></span>
+                    </div>
+                    <div class="col-xl-3 col-md-3">
+                        <label asp-for="Producto.Tipo" class="form-label">Tipo / Variante</label>
+                        <input asp-for="Producto.Tipo" class="form-control" placeholder="Ej: 250ml / Natural" />
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 2: CATEGORÍA Y PRECIO -->
+                <div class="form-section-label">Comercialización</div>
+                <div class="row g-4 mb-4">
+                    <div class="col-xl-8 col-md-7">
+                        <label asp-for="Producto.CategoriaId" class="form-label">Categoría <span class="text-danger">*</span></label>
+                        <select asp-for="Producto.CategoriaId" asp-items="Model.CategoriasSelect" class="form-select">
+                            <option value="">-- Seleccione una categoría --</option>
+                        </select>
+                        <span asp-validation-for="Producto.CategoriaId" class="text-danger" style="font-size:11px"></span>
+                    </div>
+                    <div class="col-xl-4 col-md-5">
+                        <label asp-for="Producto.PrecioVenta" class="form-label">Precio de Venta <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">$</span>
+                            <input asp-for="Producto.PrecioVenta" class="form-control fw-bold" placeholder="0.00" />
+                        </div>
+                        <span asp-validation-for="Producto.PrecioVenta" class="text-danger" style="font-size:11px"></span>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 3: STOCK -->
+                <div class="form-section-label">Control de Inventario Inicial</div>
+                <div class="row g-4 mb-5">
+                    <div class="col-md-6">
+                        <div class="stock-box">
+                            <label asp-for="Producto.StockActual" class="form-label">Stock Inicial en Almacén</label>
+                            <input asp-for="Producto.StockActual" class="form-control form-control-lg text-center" placeholder="0" />
+                            <span asp-validation-for="Producto.StockActual" class="text-danger" style="font-size:11px"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="stock-box">
+                            <label asp-for="Producto.StockMinimo" class="form-label">Stock Mínimo para Alertas</label>
+                            <input asp-for="Producto.StockMinimo" class="form-control form-control-lg text-center" placeholder="0" />
+                            <span asp-validation-for="Producto.StockMinimo" class="text-danger" style="font-size:11px"></span>
+                            <div class="text-muted mt-2 text-center" style="font-size:11px;">El sistema notificará cuando el stock sea igual o menor a este valor</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ACCIONES -->
+                <div class="d-flex justify-content-between align-items-center pt-4 border-top">
+                    <span class="text-muted" style="font-size: 13px;">Los campos marcados con <span class="text-danger">*</span> son obligatorios</span>
+                    <div class="d-flex gap-3">
+                        <a asp-page="Index" class="btn-cancel text-decoration-none">Cancelar</a>
+                        <button type="submit" class="btn-save">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" /><polyline points="17 21 17 13 7 13 7 21" /><polyline points="7 3 7 8 15 8" /></svg>
+                            Guardar Producto
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

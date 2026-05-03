@@ -1,0 +1,51 @@
+﻿@page
+@model Origami_Sys.Pages.Empleado.IndexModel
+@{
+    ViewData["Title"] = "Empleados";
+    ViewData["Modulo"] = "RRHH";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Empleados</h5>
+    <a class="btn btn-sm btn-success" asp-page="Crear">+ Nuevo Empleado</a>
+</div>
+
+<table class="table table-striped table-sm">
+    <thead>
+        <tr>
+            <th>Cédula</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Teléfono</th>
+            <th>Salario Base</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var e in Model.Empleados)
+        {
+            <tr>
+                <td>@e.Cedula</td>
+                <td>@e.Nombre</td>
+                <td>@e.Apellido</td>
+                <td>@e.Telefono</td>
+                <td>@e.SalarioBase.ToString("C")</td>
+                <td>
+                    @if (e.Activo)
+                    {
+                        <span class="badge bg-success">Activo</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Inactivo</span>
+                    }
+                </td>
+                <td>
+                    <a class="btn btn-secondary btn-sm" asp-page="Editar" asp-route-id="@e.Id">Editar</a>
+                    <a class="btn btn-danger btn-sm" asp-page="Borrar" asp-route-id="@e.Id">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

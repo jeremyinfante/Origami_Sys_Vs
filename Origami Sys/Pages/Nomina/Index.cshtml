@@ -1,0 +1,41 @@
+﻿@page
+@model Origami_Sys.Pages.Nomina.IndexModel
+@{
+    ViewData["Title"] = "Nómina";
+    ViewData["Modulo"] = "RRHH";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Nómina</h5>
+    <a class="btn btn-sm btn-success" asp-page="Crear">+ Registrar Pago</a>
+</div>
+
+<table class="table table-striped table-sm">
+    <thead>
+        <tr>
+            <th>Empleado</th>
+            <th>Período</th>
+            <th>Salario Pagado</th>
+            <th>Deducciones</th>
+            <th>Salario Neto</th>
+            <th>Fecha Pago</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var n in Model.Nominas)
+        {
+            <tr>
+                <td>@n.Empleado?.Nombre @n.Empleado?.Apellido</td>
+                <td>@n.PeriodoInicio.ToString("dd/MM/yy") - @n.PeriodoFin.ToString("dd/MM/yy")</td>
+                <td>@n.SalarioPagado.ToString("C")</td>
+                <td>@n.Deducciones.ToString("C")</td>
+                <td><strong>@n.SalarioNeto.ToString("C")</strong></td>
+                <td>@n.FechaPago.ToString("dd/MM/yyyy")</td>
+                <td>
+                    <a class="btn btn-danger btn-sm" asp-page="Borrar" asp-route-id="@n.Id">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

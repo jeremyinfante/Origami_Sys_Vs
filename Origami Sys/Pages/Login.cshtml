@@ -1,0 +1,49 @@
+﻿@page
+@model Origami_Sys.Pages.LoginModel
+@{
+    ViewData["Title"] = "Iniciar Sesión";
+    Layout = "~/Pages/Shared/_LayoutLogin.cshtml";
+}
+
+<div style="width:100%; max-width:380px; padding: 0 16px;">
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+            <div class="text-center mb-4">
+                <div style="width:48px;height:48px;background:#1e3a2f;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px;">
+                    <span style="color:#7ed4a0;font-size:22px;">✿</span>
+                </div>
+                <h5 class="mb-0 fw-semibold">Origami Skin</h5>
+                <small class="text-muted">Sistema de Gestión</small>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="alert alert-danger py-2 small">@Model.ErrorMessage</div>
+            }
+
+            <form method="post">
+                <div class="mb-3">
+                    <label asp-for="Username" class="form-label small fw-semibold">Usuario</label>
+                    <input asp-for="Username" class="form-control" placeholder="usuario" autofocus />
+                    <span asp-validation-for="Username" class="text-danger small"></span>
+                </div>
+                <div class="mb-4">
+                    <label asp-for="Password" class="form-label small fw-semibold">Contraseña</label>
+                    <input asp-for="Password" type="password" class="form-control" placeholder="••••••••" />
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+                <button type="submit" class="btn w-100" style="background:#1e3a2f;color:#a8d5b5;border:none;">
+                    Ingresar
+                </button>
+            </form>
+        </div>
+    </div>
+    <p class="text-center text-muted mt-3" style="font-size:11px;">© 2026 Origami Skin</p>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}

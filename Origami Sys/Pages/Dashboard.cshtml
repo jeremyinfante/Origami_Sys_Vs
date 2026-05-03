@@ -1,0 +1,76 @@
+﻿@page
+@model Origami_Sys.Pages.DashboardModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <p class="text-muted small mb-1">Productos totales</p>
+                <h4 class="mb-0">@Model.TotalProductos</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <p class="text-muted small mb-1">Bajo stock</p>
+                <h4 class="mb-0 text-warning">@Model.ProductosBajoStock</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <p class="text-muted small mb-1">Categorías</p>
+                <h4 class="mb-0">@Model.TotalCategorias</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <p class="text-muted small mb-1">Empleados activos</p>
+                <h4 class="mb-0">@Model.EmpleadosActivos</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.AlertasStock.Any())
+{
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom">
+            <strong class="small">⚠ Alertas de reabastecimiento</strong>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-sm mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Producto</th>
+                        <th>Stock actual</th>
+                        <th>Stock mínimo</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model.AlertasStock)
+                    {
+                        <tr>
+                            <td>@p.Nombre</td>
+                            <td><span class="badge bg-danger">@p.StockActual</span></td>
+                            <td>@p.StockMinimo</td>
+                            <td>
+                                <a asp-page="/Producto/Editar" asp-route-id="@p.Id" class="btn btn-sm btn-outline-secondary">
+                                    Editar
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

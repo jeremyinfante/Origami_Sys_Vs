@@ -1,0 +1,79 @@
+﻿@page
+@model Origami_Sys.Pages.Nomina.CrearModel
+@{
+    ViewData["Title"] = "Registrar Pago de Nómina";
+    ViewData["Modulo"] = "RRHH";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Registrar Pago de Nómina</h5>
+    <a asp-page="Index" class="btn btn-sm btn-outline-secondary">← Volver</a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <form method="post">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Nomina.EmpleadoId" class="form-label">Empleado</label>
+                    <select asp-for="Nomina.EmpleadoId" asp-items="Model.EmpleadosSelect"
+                            class="form-select" id="empleadoSelect">
+                        <option value="">-- Seleccione --</option>
+                    </select>
+                    <span asp-validation-for="Nomina.EmpleadoId" class="text-danger small"></span>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label asp-for="Nomina.PeriodoInicio" class="form-label">Período Inicio</label>
+                    <input asp-for="Nomina.PeriodoInicio" type="date" class="form-control" />
+                    <span asp-validation-for="Nomina.PeriodoInicio" class="text-danger small"></span>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label asp-for="Nomina.PeriodoFin" class="form-label">Período Fin</label>
+                    <input asp-for="Nomina.PeriodoFin" type="date" class="form-control" />
+                    <span asp-validation-for="Nomina.PeriodoFin" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label asp-for="Nomina.SalarioPagado" class="form-label">Salario Pagado</label>
+                    <input asp-for="Nomina.SalarioPagado" class="form-control" id="salarioPagado" />
+                    <span asp-validation-for="Nomina.SalarioPagado" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label asp-for="Nomina.Deducciones" class="form-label">Deducciones</label>
+                    <input asp-for="Nomina.Deducciones" class="form-control" id="deducciones" value="0" />
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label asp-for="Nomina.SalarioNeto" class="form-label">Salario Neto</label>
+                    <input asp-for="Nomina.SalarioNeto" class="form-control" id="salarioNeto" readonly />
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success">Guardar</button>
+            <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        // Calcula salario neto automáticamente
+        function calcularNeto() {
+            const pagado = parseFloat(document.getElementById('salarioPagado').value) || 0;
+            const deducciones = parseFloat(document.getElementById('deducciones').value) || 0;
+            document.getElementById('salarioNeto').value = (pagado - deducciones).toFixed(2);
+        }
+        document.getElementById('salarioPagado').addEventListener('input', calcularNeto);
+        document.getElementById('deducciones').addEventListener('input', calcularNeto);
+
+        // Carga el salario base del empleado seleccionado
+        const salarios = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SalariosEmpleados));
+        document.getElementById('empleadoSelect').addEventListener('change', function() {
+            const id = this.value;
+            if (salarios[id]) {
+                document.getElementById('salarioPagado').value = salarios[id];
+                calcularNeto();
+            }
+        });
+    </script>
+}

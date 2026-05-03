@@ -1,0 +1,53 @@
+﻿@page
+@model Origami_Sys.Pages.LoteProduccion.IndexModel
+@{
+    ViewData["Title"] = "Lotes de Producción";
+    ViewData["Modulo"] = "Inventario";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Lotes de Producción</h5>
+    <a class="btn btn-sm btn-success" asp-page="Crear">+ Registrar Lote</a>
+</div>
+
+<table class="table table-sm table-striped">
+    <thead>
+        <tr>
+            <th>N° Lote</th>
+            <th>Fecha</th>
+            <th>Materias usadas</th>
+            <th>Productos generados</th>
+            <th>Observaciones</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var l in Model.Lotes)
+        {
+            <tr>
+                <td><strong>@l.NumeroLote</strong></td>
+                <td>@l.Fecha.ToString("dd/MM/yyyy")</td>
+                <td>
+                    @foreach (var d in l.Detalles)
+                    {
+                        <span class="badge bg-secondary me-1">
+                            @d.MateriaPrima?.Nombre: @d.CantidadUsada @d.MateriaPrima?.UnidadMedida
+                        </span>
+                    }
+                </td>
+                <td>
+                    @foreach (var p in l.Productos)
+                    {
+                        <span class="badge bg-success me-1">
+                            @p.Producto?.Nombre: +@p.CantidadProducida
+                        </span>
+                    }
+                </td>
+                <td>@(l.Observaciones ?? "—")</td>
+                <td>
+                    <a class="btn btn-danger btn-sm" asp-page="Borrar" asp-route-id="@l.Id">Anular</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

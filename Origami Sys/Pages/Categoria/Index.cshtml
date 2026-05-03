@@ -1,0 +1,33 @@
+﻿@page
+@model Origami_Sys.Pages.Categoria.IndexModel
+@{
+    ViewData["Title"] = "Categorías";
+}
+
+<h1>Categorías</h1>
+<a class="btn btn-primary mb-3" asp-page="Crear">Nueva Categoría</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var cat in Model.Categorias)
+        {
+            <tr>
+                <td>@cat.Id</td>
+                <td>@cat.Nombre</td>
+                <td>@cat.Descripcion</td>
+                <td>
+                    <a class="btn btn-secondary btn-sm" asp-page="Editar" asp-route-id="@cat.Id">Editar</a>
+                    <a class="btn btn-danger btn-sm" asp-page="Borrar" asp-route-id="@cat.Id">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

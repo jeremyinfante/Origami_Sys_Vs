@@ -1,0 +1,53 @@
+﻿@page
+@model Origami_Sys.Pages.CompraMateriaPrima.CrearModel
+@{
+    ViewData["Title"] = "Registrar Compra";
+    ViewData["Modulo"] = "Inventario";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Registrar Compra de Materia Prima</h5>
+    <a asp-page="Index" class="btn btn-sm btn-outline-secondary">← Volver</a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <form method="post">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Compra.MateriaPrimaId" class="form-label">Materia Prima</label>
+                    <select asp-for="Compra.MateriaPrimaId" asp-items="Model.MateriasSelect" class="form-select">
+                        <option value="">-- Seleccione --</option>
+                    </select>
+                    <span asp-validation-for="Compra.MateriaPrimaId" class="text-danger small"></span>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label asp-for="Compra.Fecha" class="form-label">Fecha</label>
+                    <input asp-for="Compra.Fecha" type="date" class="form-control" />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label asp-for="Compra.Cantidad" class="form-label">Cantidad</label>
+                    <input asp-for="Compra.Cantidad" class="form-control" />
+                    <span asp-validation-for="Compra.Cantidad" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label asp-for="Compra.CostoTotal" class="form-label">Costo Total</label>
+                    <input asp-for="Compra.CostoTotal" class="form-control" />
+                    <span asp-validation-for="Compra.CostoTotal" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label asp-for="Compra.Proveedor" class="form-label">Proveedor</label>
+                    <input asp-for="Compra.Proveedor" class="form-control" placeholder="Opcional" />
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label asp-for="Compra.Observaciones" class="form-label">Observaciones</label>
+                    <input asp-for="Compra.Observaciones" class="form-control" placeholder="Opcional" />
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success">Guardar</button>
+            <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

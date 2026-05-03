@@ -1,0 +1,50 @@
+﻿@page "{id:int}"
+@model Origami_Sys.Pages.Transaccion.EditarModel
+@{
+    ViewData["Title"] = "Editar Transacción";
+    ViewData["Modulo"] = "Financiero";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Editar Transacción</h5>
+    <a asp-page="Index" class="btn btn-sm btn-outline-secondary">← Volver</a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <form method="post">
+            <input type="hidden" asp-for="Transaccion.Id" />
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Transaccion.Descripcion" class="form-label">Descripción</label>
+                    <input asp-for="Transaccion.Descripcion" class="form-control" />
+                    <span asp-validation-for="Transaccion.Descripcion" class="text-danger small"></span>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label asp-for="Transaccion.Monto" class="form-label">Monto</label>
+                    <input asp-for="Transaccion.Monto" class="form-control" />
+                    <span asp-validation-for="Transaccion.Monto" class="text-danger small"></span>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label asp-for="Transaccion.Fecha" class="form-label">Fecha</label>
+                    <input asp-for="Transaccion.Fecha" type="date" class="form-control" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Transaccion.Tipo" class="form-label">Tipo</label>
+                    <select asp-for="Transaccion.Tipo" class="form-select"
+                            asp-items="Html.GetEnumSelectList<Origami_Sys.Modelos.TipoTransaccion>()">
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Actualizar</button>
+            <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}

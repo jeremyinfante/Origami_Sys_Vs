@@ -1,0 +1,29 @@
+﻿@page "{id:int}"
+@model Origami_Sys.Pages.Categoria.EditarModel
+@{
+    ViewData["Title"] = "Editar Categoría";
+}
+
+<h1>Editar Categoría</h1>
+
+<form method="post">
+    <input type="hidden" asp-for="Categoria.Id" />
+    <div class="mb-3">
+        <label asp-for="Categoria.Nombre" class="form-label"></label>
+        <input asp-for="Categoria.Nombre" class="form-control" />
+        <span asp-validation-for="Categoria.Nombre" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Categoria.Descripcion" class="form-label"></label>
+        <textarea asp-for="Categoria.Descripcion" class="form-control" rows="3"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Actualizar</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}

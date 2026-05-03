@@ -1,0 +1,51 @@
+﻿@page
+@model Origami_Sys.Pages.MateriaPrima.IndexModel
+@{
+    ViewData["Title"] = "Materias Primas";
+    ViewData["Modulo"] = "Inventario";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Materias Primas</h5>
+    <a class="btn btn-sm btn-success" asp-page="Crear">+ Nueva Materia Prima</a>
+</div>
+
+<table class="table table-sm table-striped">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Unidad</th>
+            <th>Stock Actual</th>
+            <th>Stock Mínimo</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var m in Model.MateriasPrimas)
+        {
+            <tr class="@(m.StockActual <= m.StockMinimo ? "table-warning" : "")">
+                <td>@m.Nombre</td>
+                <td>@m.Descripcion</td>
+                <td>@m.UnidadMedida</td>
+                <td>@m.StockActual @m.UnidadMedida</td>
+                <td>@m.StockMinimo @m.UnidadMedida</td>
+                <td>
+                    @if (m.StockActual <= m.StockMinimo)
+                    {
+                        <span class="badge bg-warning text-dark">⚠ Reabastecer</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">OK</span>
+                    }
+                </td>
+                <td>
+                    <a class="btn btn-secondary btn-sm" asp-page="Editar" asp-route-id="@m.Id">Editar</a>
+                    <a class="btn btn-danger btn-sm" asp-page="Borrar" asp-route-id="@m.Id">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

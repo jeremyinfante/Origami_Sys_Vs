@@ -1,0 +1,37 @@
+﻿@page "{id:int}"
+@model Origami_Sys.Pages.Transaccion.BorrarModel
+@{
+    ViewData["Title"] = "Eliminar Transacción";
+    ViewData["Modulo"] = "Financiero";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Eliminar Transacción</h5>
+    <a asp-page="Index" class="btn btn-sm btn-outline-secondary">← Volver</a>
+</div>
+
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+        <p>¿Está seguro de que desea eliminar esta transacción?</p>
+        <p><strong>Descripción:</strong> @Model.Transaccion.Descripcion</p>
+        <p>
+            <strong>Tipo:</strong>
+            @if (Model.Transaccion.Tipo == Origami_Sys.Modelos.TipoTransaccion.Ingreso)
+            {
+                <span class="badge bg-success">Ingreso</span>
+            }
+            else
+            {
+                <span class="badge bg-danger">Egreso</span>
+            }
+        </p>
+        <p><strong>Monto:</strong> @Model.Transaccion.Monto.ToString("C")</p>
+        <p><strong>Fecha:</strong> @Model.Transaccion.Fecha.ToString("dd/MM/yyyy")</p>
+    </div>
+</div>
+
+<form method="post">
+    <input type="hidden" asp-for="Transaccion.Id" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
+</form>
