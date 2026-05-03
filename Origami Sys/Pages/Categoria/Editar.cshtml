@@ -2,28 +2,105 @@
 @model Origami_Sys.Pages.Categoria.EditarModel
 @{
     ViewData["Title"] = "Editar Categoría";
+    ViewData["Modulo"] = "Inventario";
 }
 
-<h1>Editar Categoría</h1>
+<style>
+    :root{--g-dark:#1a4332;--g-bright:#10b981;--border:#e5e7eb;--text:#1f2937;--muted:#6b7280;}
+    .page-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+    .page-header h1{font-size:20px;font-weight:700;color:var(--g-dark);margin:0 0 3px 0;}
+    .breadcrumb-txt{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px;}
+    .card-clean{background:white;border:1px solid var(--border);border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+    .section-label{font-size:10.5px;font-weight:700;color:var(--g-bright);text-transform:uppercase;letter-spacing:.6px;display:flex;align-items:center;gap:10px;margin:0 0 14px 0;}
+    .section-label::after{content:"";flex:1;height:1px;background:#f1f5f9;}
+    .form-label{font-size:12px;font-weight:600;color:#374151;margin-bottom:5px;}
+    .form-control{font-size:13px;border-color:var(--border);border-radius:7px;padding:7px 11px;transition:border-color .15s,box-shadow .15s;}
+    .form-control:focus{border-color:var(--g-bright);box-shadow:0 0 0 3px rgba(16,185,129,.1);outline:none;}
+    .char-count{font-size:11px;color:var(--muted);text-align:right;margin-top:3px;}
+    .change-dot{width:7px;height:7px;border-radius:50%;background:#f59e0b;display:none;margin-left:8px;vertical-align:middle;}
+    .change-dot.visible{display:inline-block;}
+    .btn-save{display:inline-flex;align-items:center;gap:7px;background:var(--g-dark);color:white;border:none;padding:8px 22px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s,transform .1s;}
+    .btn-save:hover{background:#2d5a3d;transform:translateY(-1px);}
+    .btn-back{display:inline-flex;align-items:center;gap:6px;background:white;color:var(--muted);border:1px solid var(--border);padding:8px 16px;border-radius:8px;font-size:13px;text-decoration:none;transition:background .15s,color .15s;}
+    .btn-back:hover{background:#f9fafb;color:var(--text);}
+</style>
 
-<form method="post">
-    <input type="hidden" asp-for="Categoria.Id" />
-    <div class="mb-3">
-        <label asp-for="Categoria.Nombre" class="form-label"></label>
-        <input asp-for="Categoria.Nombre" class="form-control" />
-        <span asp-validation-for="Categoria.Nombre" class="text-danger"></span>
+<div class="page-header">
+    <div>
+        <div class="breadcrumb-txt">@ViewData["Modulo"] / Categorías / Editar</div>
+        <div class="d-flex align-items-center">
+            <h1>@Model.Categoria.Nombre</h1>
+            <span class="change-dot" id="changeDot" title="Cambios sin guardar"></span>
+        </div>
     </div>
-    <div class="mb-3">
-        <label asp-for="Categoria.Descripcion" class="form-label"></label>
-        <textarea asp-for="Categoria.Descripcion" class="form-control" rows="3"></textarea>
+    <a asp-page="Index" class="btn-back">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+        Volver
+    </a>
+</div>
+
+<div class="card-clean">
+    <div class="card-body p-4">
+        <form method="post" id="formEditar">
+            <input type="hidden" asp-for="Categoria.Id" />
+
+            <div class="section-label">Información de la Categoría</div>
+            <div class="row g-3 mb-4">
+                <div class="col-md-5">
+                    <label asp-for="Categoria.Nombre" class="form-label">Nombre <span class="text-danger">*</span></label>
+                    <input asp-for="Categoria.Nombre" class="form-control" maxlength="100" id="inputNombre" />
+                    <div class="char-count"><span id="charNombre">0</span>/100</div>
+                    <span asp-validation-for="Categoria.Nombre" class="text-danger" style="font-size:11px"></span>
+                </div>
+                <div class="col-md-7">
+                    <label asp-for="Categoria.Descripcion" class="form-label">Descripción</label>
+                    <textarea asp-for="Categoria.Descripcion" class="form-control" rows="3" maxlength="300" id="inputDesc"></textarea>
+                    <div class="char-count"><span id="charDesc">0</span>/300</div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center pt-3" style="border-top:1px solid #f3f4f6">
+                <small class="text-muted">Los campos con <span class="text-danger">*</span> son obligatorios</small>
+                <div class="d-flex gap-2">
+                    <a asp-page="Index" class="btn-back">Cancelar</a>
+                    <button type="submit" class="btn-save">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                        Guardar Cambios
+                    </button>
+                </div>
+            </div>
+        </form>
     </div>
-    <button type="submit" class="btn btn-primary">Actualizar</button>
-    <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
-</form>
+</div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script>
+        const inputNombre = document.getElementById('inputNombre');
+        const inputDesc   = document.getElementById('inputDesc');
+        const changeDot   = document.getElementById('changeDot');
 
+        // Contadores de caracteres
+        function actualizarContadores() {
+            document.getElementById('charNombre').textContent = inputNombre.value.length;
+            document.getElementById('charDesc').textContent   = inputDesc.value.length;
+        }
+        actualizarContadores();
+
+        // Punto de cambios pendientes
+        let guardado = false;
+        document.getElementById('formEditar').querySelectorAll('input, textarea').forEach(el => {
+            el.addEventListener('input', () => {
+                changeDot.classList.add('visible');
+                actualizarContadores();
+            });
+        });
+
+        document.getElementById('formEditar').addEventListener('submit', () => guardado = true);
+        window.addEventListener('beforeunload', e => {
+            if (!guardado && changeDot.classList.contains('visible')) {
+                e.preventDefault(); e.returnValue = '';
+            }
+        });
+    </script>
 }
