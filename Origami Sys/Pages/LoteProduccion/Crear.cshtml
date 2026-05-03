@@ -1,103 +1,111 @@
 ﻿@page
 @model Origami_Sys.Pages.LoteProduccion.CrearModel
 @{
-    ViewData["Title"] = "Registrar Lote de Producción";
+    ViewData["Title"] = "Registrar Lote";
     ViewData["Modulo"] = "Inventario";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="mb-0">Registrar Lote — <span class="text-muted small">@Model.NumeroLote</span></h5>
-    <a asp-page="Index" class="btn btn-sm btn-outline-secondary">← Volver</a>
+<style>
+    :root{--g-dark:#1a4332;--g-bright:#10b981;--border:#e5e7eb;--muted:#6b7280;--red-soft:#fef2f2;--red-txt:#991b1b;}
+    .page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+    .breadcrumb-txt{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px;}
+    .lote-badge{background:var(--g-dark);color:white;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-left:8px;}
+    .card-clean{background:white;border:1px solid var(--border);border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.05);height:100%;}
+    .section-label{font-size:10.5px;font-weight:700;color:var(--g-bright);text-transform:uppercase;letter-spacing:.6px;display:flex;align-items:center;gap:10px;margin-bottom:15px;}
+    .section-label::after{content:"";flex:1;height:1px;background:#f1f5f9;}
+    .table-clean{font-size:13px;}
+    .table-clean thead th{background:#f9fafb;border-bottom:1px solid var(--border);color:var(--muted);font-weight:600;padding:10px;}
+    .btn-add{background:var(--g-bright);color:white;border:none;border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+    .btn-add:hover{filter:brightness(0.9);transform:scale(1.05);}
+    .empty-state{color:var(--muted);font-size:12px;text-align:center;padding:20px;}
+    .control-label{font-size:12px;font-weight:600;color:#374151;margin-bottom:4px;}
+</style>
+
+<div class="page-header">
+    <div>
+        <div class="breadcrumb-txt">@ViewData["Modulo"] / Producción</div>
+        <h1 class="h5 mb-0 d-flex align-items-center">
+            Registrar Nuevo Lote <span class="lote-badge">@Model.NumeroLote</span>
+        </h1>
+    </div>
+    <a asp-page="Index" class="btn-back" style="text-decoration:none; color:var(--muted); font-size:13px;">← Volver</a>
 </div>
 
 <form method="post">
     <input type="hidden" name="NumeroLote" value="@Model.NumeroLote" />
-
-    <div class="row mb-3">
-        <div class="col-md-4">
-            <label class="form-label">Fecha</label>
-            <input type="date" name="Fecha" class="form-control"
-                   value="@DateTime.Today.ToString("yyyy-MM-dd")" />
-        </div>
-        <div class="col-md-8">
-            <label class="form-label">Observaciones</label>
-            <input type="text" name="Observaciones" class="form-control" placeholder="Opcional" />
-        </div>
-    </div>
-
-    <div class="row g-3">
-        <!-- Materias primas consumidas -->
-        <div class="col-md-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white">
-                    <strong class="small">Materias Primas Consumidas</strong>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex gap-2 mb-2">
-                        <select id="mpSelect" class="form-select form-select-sm">
-                            <option value="">-- Materia Prima --</option>
-                            @foreach (var m in Model.MateriasPrimas)
-                            {
-                                <option value="@m.Id" data-nombre="@m.Nombre"
-                                        data-unidad="@m.UnidadMedida"
-                                        data-stock="@m.StockActual">
-                                    @m.Nombre (Stock: @m.StockActual @m.UnidadMedida)
-                                </option>
-                            }
-                        </select>
-                        <input type="number" id="mpCantidad" class="form-control form-control-sm"
-                               placeholder="Cantidad" min="0.01" step="0.01" style="width:110px" />
-                        <button type="button" class="btn btn-success btn-sm" onclick="agregarMP()">+</button>
-                    </div>
-                    <table class="table table-sm mb-0">
-                        <thead class="table-light">
-                            <tr><th>Materia Prima</th><th>Cantidad</th><th></th></tr>
-                        </thead>
-                        <tbody id="mpBody"></tbody>
-                    </table>
-                    <div id="mpHiddens"></div>
-                </div>
+    
+    <div class="card-clean p-4 mb-4">
+        <div class="section-label">Información General</div>
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="control-label">Fecha de Producción</label>
+                <input type="date" name="Fecha" class="form-control form-control-sm" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
             </div>
-        </div>
-
-        <!-- Productos generados -->
-        <div class="col-md-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white">
-                    <strong class="small">Productos Generados</strong>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex gap-2 mb-2">
-                        <select id="prodSelect" class="form-select form-select-sm">
-                            <option value="">-- Producto --</option>
-                            @foreach (var p in Model.Productos)
-                            {
-                                <option value="@p.Id" data-nombre="@p.Nombre">
-                                    @p.Nombre
-                                </option>
-                            }
-                        </select>
-                        <input type="number" id="prodCantidad" class="form-control form-control-sm"
-                               placeholder="Cantidad" min="1" style="width:110px" />
-                        <button type="button" class="btn btn-success btn-sm" onclick="agregarProd()">+</button>
-                    </div>
-                    <table class="table table-sm mb-0">
-                        <thead class="table-light">
-                            <tr><th>Producto</th><th>Cantidad</th><th></th></tr>
-                        </thead>
-                        <tbody id="prodBody"></tbody>
-                    </table>
-                    <div id="prodHiddens"></div>
-                </div>
+            <div class="col-md-9">
+                <label class="control-label">Observaciones del Lote</label>
+                <input type="text" name="Observaciones" class="form-control form-control-sm" placeholder="Ej: Producción especial de temporada, lote de prueba..." />
             </div>
         </div>
     </div>
 
-    <div class="mt-3">
-        <button type="submit" class="btn btn-success" id="btnGuardar" disabled>
-            Registrar Lote
+    <div class="row g-4">
+        <!-- MATERIAS PRIMAS -->
+        <div class="col-md-6">
+            <div class="card-clean p-3">
+                <div class="section-label" style="color:#d97706">Consumo de Insumos (Salida)</div>
+                <div class="d-flex gap-2 mb-3">
+                    <select id="mpSelect" class="form-select form-select-sm">
+                        <option value="">Seleccionar Materia Prima...</option>
+                        @foreach (var m in Model.MateriasPrimas) {
+                            <option value="@m.Id" data-nombre="@m.Nombre" data-unidad="@m.UnidadMedida" data-stock="@m.StockActual">
+                                @m.Nombre (Stock: @m.StockActual @m.UnidadMedida)
+                            </option>
+                        }
+                    </select>
+                    <input type="number" id="mpCantidad" class="form-control form-control-sm" placeholder="Cant." style="width:85px" />
+                    <button type="button" class="btn-add" onclick="agregarMP()">+</button>
+                </div>
+                
+                <table class="table table-clean">
+                    <thead><tr><th>Materia Prima</th><th>Cant.</th><th width="40"></th></tr></thead>
+                    <tbody id="mpBody"></tbody>
+                </table>
+                <div id="mpEmpty" class="empty-state">No se han añadido insumos</div>
+                <div id="mpHiddens"></div>
+            </div>
+        </div>
+
+        <!-- PRODUCTOS GENERADOS -->
+        <div class="col-md-6">
+            <div class="card-clean p-3">
+                <div class="section-label">Productos Finales (Entrada)</div>
+                <div class="d-flex gap-2 mb-3">
+                    <select id="prodSelect" class="form-select form-select-sm">
+                        <option value="">Seleccionar Producto...</option>
+                        @foreach (var p in Model.Productos) {
+                            <option value="@p.Id" data-nombre="@p.Nombre">@p.Nombre</option>
+                        }
+                    </select>
+                    <input type="number" id="prodCantidad" class="form-control form-control-sm" placeholder="Cant." style="width:85px" />
+                    <button type="button" class="btn-add" onclick="agregarProd()">+</button>
+                </div>
+
+                <table class="table table-clean">
+                    <thead><tr><th>Producto Terminado</th><th>Cant.</th><th width="40"></th></tr></thead>
+                    <tbody id="prodBody"></tbody>
+                </table>
+                <div id="prodEmpty" class="empty-state">No se han añadido productos</div>
+                <div id="prodHiddens"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 pt-3 d-flex gap-2" style="border-top:1px solid var(--border);">
+        <button type="submit" class="btn btn-save" id="btnGuardar" disabled 
+                style="background:var(--g-dark); color:white; border:none; padding:8px 25px; border-radius:8px; font-weight:600; opacity:0.5;">
+            Registrar Producción
         </button>
-        <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
+        <a asp-page="Index" class="btn btn-light" style="border:1px solid var(--border); border-radius:8px; font-size:14px; padding:8px 20px;">Cancelar</a>
     </div>
 </form>
 
@@ -108,81 +116,66 @@
     function agregarMP() {
         const sel = document.getElementById('mpSelect');
         const opt = sel.options[sel.selectedIndex];
-        if (!opt.value) { alert('Seleccione una materia prima'); return; }
-
-        const cantidad = parseFloat(document.getElementById('mpCantidad').value);
-        const stock = parseFloat(opt.dataset.stock);
-        if (!cantidad || cantidad <= 0) { alert('Ingrese una cantidad válida'); return; }
-        if (cantidad > stock) { alert(`Stock insuficiente. Disponible: ${stock} ${opt.dataset.unidad}`); return; }
-        if (mps.find(m => m.id == opt.value)) { alert('Ya está en la lista'); return; }
-
-        mps.push({ id: opt.value, nombre: opt.dataset.nombre, unidad: opt.dataset.unidad, cantidad });
+        const cant = parseFloat(document.getElementById('mpCantidad').value);
+        if(!opt.value || !cant || cant <= 0) return;
+        if(cant > parseFloat(opt.dataset.stock)) { alert('Stock insuficiente'); return; }
+        
+        mps.push({ id: opt.value, nombre: opt.dataset.nombre, unidad: opt.dataset.unidad, cantidad: cant });
         renderMP();
-        sel.value = '';
-        document.getElementById('mpCantidad').value = '';
+        sel.value = ''; document.getElementById('mpCantidad').value = '';
     }
-
-    function eliminarMP(i) { mps.splice(i, 1); renderMP(); }
 
     function renderMP() {
         const tbody = document.getElementById('mpBody');
-        tbody.innerHTML = '';
-        mps.forEach((m, i) => {
-            tbody.innerHTML += `<tr>
-                <td>${m.nombre}</td>
-                <td>${m.cantidad} ${m.unidad}</td>
-                <td><button type="button" class="btn btn-danger btn-sm" onclick="eliminarMP(${i})">✕</button></td>
-            </tr>`;
-        });
-        const h = document.getElementById('mpHiddens');
-        h.innerHTML = '';
-        mps.forEach((m, i) => {
-            h.innerHTML += `
-                <input type="hidden" name="MateriasUsadas[${i}].MateriaPrimaId" value="${m.id}" />
-                <input type="hidden" name="MateriasUsadas[${i}].CantidadUsada" value="${m.cantidad}" />`;
-        });
-        validarBoton();
+        const empty = document.getElementById('mpEmpty');
+        tbody.innerHTML = mps.map((m, i) => `
+            <tr>
+                <td><strong>${m.nombre}</strong></td>
+                <td>${m.cantidad} <small class="text-muted">${m.unidad}</small></td>
+                <td><button type="button" class="btn text-danger p-0" onclick="mps.splice(${i},1);renderMP()">✕</button></td>
+            </tr>`).join('');
+        empty.style.display = mps.length ? 'none' : 'block';
+        
+        document.getElementById('mpHiddens').innerHTML = mps.map((m, i) => `
+            <input type="hidden" name="MateriasUsadas[${i}].MateriaPrimaId" value="${m.id}" />
+            <input type="hidden" name="MateriasUsadas[${i}].CantidadUsada" value="${m.cantidad}" />`).join('');
+        validar();
     }
 
+    // Funciones similares para Productos (agregarProd/renderProd)...
     function agregarProd() {
         const sel = document.getElementById('prodSelect');
         const opt = sel.options[sel.selectedIndex];
-        if (!opt.value) { alert('Seleccione un producto'); return; }
-
-        const cantidad = parseInt(document.getElementById('prodCantidad').value);
-        if (!cantidad || cantidad < 1) { alert('Ingrese una cantidad válida'); return; }
-        if (prods.find(p => p.id == opt.value)) { alert('Ya está en la lista'); return; }
-
-        prods.push({ id: opt.value, nombre: opt.dataset.nombre, cantidad });
+        const cant = parseInt(document.getElementById('prodCantidad').value);
+        if(!opt.value || !cant || cant <= 0) return;
+        
+        prods.push({ id: opt.value, nombre: opt.dataset.nombre, cantidad: cant });
         renderProd();
-        sel.value = '';
-        document.getElementById('prodCantidad').value = '';
+        sel.value = ''; document.getElementById('prodCantidad').value = '';
     }
-
-    function eliminarProd(i) { prods.splice(i, 1); renderProd(); }
 
     function renderProd() {
         const tbody = document.getElementById('prodBody');
-        tbody.innerHTML = '';
-        prods.forEach((p, i) => {
-            tbody.innerHTML += `<tr>
-                <td>${p.nombre}</td>
-                <td>${p.cantidad}</td>
-                <td><button type="button" class="btn btn-danger btn-sm" onclick="eliminarProd(${i})">✕</button></td>
-            </tr>`;
-        });
-        const h = document.getElementById('prodHiddens');
-        h.innerHTML = '';
-        prods.forEach((p, i) => {
-            h.innerHTML += `
-                <input type="hidden" name="ProductosGenerados[${i}].ProductoId" value="${p.id}" />
-                <input type="hidden" name="ProductosGenerados[${i}].CantidadProducida" value="${p.cantidad}" />`;
-        });
-        validarBoton();
+        const empty = document.getElementById('prodEmpty');
+        tbody.innerHTML = prods.map((p, i) => `
+            <tr>
+                <td><strong>${p.nombre}</strong></td>
+                <td>${p.cantidad} <small class="text-muted">uds</small></td>
+                <td><button type="button" class="btn text-danger p-0" onclick="prods.splice(${i},1);renderProd()">✕</button></td>
+            </tr>`).join('');
+        empty.style.display = prods.length ? 'none' : 'block';
+
+        document.getElementById('prodHiddens').innerHTML = prods.map((p, i) => `
+            <input type="hidden" name="ProductosGenerados[${i}].ProductoId" value="${p.id}" />
+            <input type="hidden" name="ProductosGenerados[${i}].CantidadProducida" value="${p.cantidad}" />`).join('');
+        validar();
     }
 
-    function validarBoton() {
-        document.getElementById('btnGuardar').disabled = mps.length === 0 || prods.length === 0;
+    function validar() {
+        const btn = document.getElementById('btnGuardar');
+        const isValid = mps.length > 0 && prods.length > 0;
+        btn.disabled = !isValid;
+        btn.style.opacity = isValid ? "1" : "0.5";
     }
 </script>
 }
