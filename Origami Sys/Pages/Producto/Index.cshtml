@@ -321,7 +321,7 @@
                                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                                     Editar
                                 </a>
-                                <button class="btn-ac ac-del" onclick="eliminarProducto(@p.Id, '@Html.Raw(p.Nombre.Replace("'", "\\'"))')">
+                                <button type="button" class="btn-ac ac-del" onclick="eliminarProducto(@p.Id, '@Html.Raw(p.Nombre.Replace("'", "\\'"))')">
                                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
                                     Eliminar
                                 </button>
@@ -364,7 +364,7 @@
                 <button onclick="cerrarModalTabla()" style="background:white;border:1px solid #e5e7eb;color:#6b7280;padding:7px 16px;border-radius:7px;font-size:12px;cursor:pointer">
                     Cancelar
                 </button>
-                <form method="post" id="formEliminar" style="margin:0">
+                <form method="post" asp-page-handler="Eliminar" id="formEliminar" style="margin:0">
                     <input type="hidden" name="id" id="modalId" />
                     <button type="submit" style="background:#be123c;color:white;border:none;padding:7px 16px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer">
                         Eliminar
@@ -473,16 +473,17 @@
 
     function eliminarProducto(id, nombre) {
         document.getElementById('modalNombre').textContent = nombre;
-        document.getElementById('formEliminar').action = `/Producto/Borrar/${id}`;
+        document.getElementById('modalId').value = id;  // ← solo setea el id, no el action
         modalEliminar.style.display = 'flex';
         document.body.style.overflow = 'hidden';
     }
+
     function cerrarModalTabla() {
         modalEliminar.style.display = 'none';
         document.body.style.overflow = '';
     }
 
-    modalEliminar.addEventListener('click', e => { if (e.target === modalEliminar) cerrarModalTabla(); });
+    modalEliminar.addEventListener('mousedown', e => { if (e.target === modalEliminar) cerrarModalTabla(); });
 
     const styleEl = document.createElement('style');
     styleEl.textContent = `@@keyframes slideUp { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }`;
