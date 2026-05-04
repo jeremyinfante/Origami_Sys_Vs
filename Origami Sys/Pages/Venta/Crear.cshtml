@@ -5,181 +5,238 @@
     ViewData["Modulo"] = "Ventas";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="mb-0">Nueva Venta — <span class="text-muted small" id="numFactura">@Model.NumeroFactura</span></h5>
-    <a asp-page="Index" class="btn btn-sm btn-outline-secondary">← Volver</a>
-</div>
+<style>
+    :root {
+        --g-dark: #1a4332;
+        --g-bright: #10b981;
+        --g-light: #ecfdf5;
+        --border: #e5e7eb;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --bg: #f9fafb;
+    }
 
-<form method="post">
-    <input type="hidden" name="NumeroFactura" value="@Model.NumeroFactura" />
+    .venta-card {
+        background: white;
+        border-radius: 8px; /* Reducido */
+        border: 1px solid var(--border);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
 
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <label class="form-label">Cliente (opcional)</label>
-            <input name="ClienteNombre" class="form-control" placeholder="Cliente general" />
-        </div>
-        <div class="col-md-6">
-            <label class="form-label">Empleado</label>
-            <select name="EmpleadoId" class="form-select">
-                @foreach (var e in Model.Empleados)
-                {
-                    <option value="@e.Id">@e.Nombre @e.Apellido</option>
-                }
-            </select>
-        </div>
-    </div>
+    .venta-header {
+        background: var(--bg);
+        padding: 12px 20px; /* Reducido de 20px */
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-    <!-- Agregar productos -->
-    <div class="card border-0 shadow-sm mb-3">
-        <div class="card-header bg-white">
-            <strong class="small">Productos</strong>
+    .form-section { padding: 16px 20px; } /* Reducido de 24px */
+    
+    .section-title {
+        font-size: 10px; /* Más pequeño */
+        text-transform: uppercase;
+        font-weight: 700;
+        color: var(--muted);
+        letter-spacing: 0.5px;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    /* Inputs más compactos */
+    .form-label { font-weight: 600; color: var(--text); font-size: 12px; margin-bottom: 4px; }
+    .form-control, .form-select {
+        border-radius: 6px;
+        padding: 6px 10px; /* Reducido de 10px 12px */
+        font-size: 13px;
+        height: 34px; /* Altura fija para consistencia */
+    }
+
+    /* Barra de Agregar Producto COMPACTA */
+    .add-product-bar {
+        background: #f3f4f6;
+        padding: 10px; /* Reducido de 16px */
+        border-radius: 8px;
+        margin-bottom: 15px;
+        display: grid;
+        grid-template-columns: 2fr 0.8fr 1fr 1fr 40px; /* Ajuste de anchos */
+        gap: 8px; /* Reducido de 12px */
+        align-items: end;
+    }
+
+    .table-detalles th { 
+        padding: 8px 12px; /* Reducido */
+        font-size: 10px; 
+    }
+    .table-detalles td { padding: 8px 12px; font-size: 13px; }
+    
+    .btn-add {
+        background: var(--g-dark); color: white; border: none;
+        height: 34px; width: 40px; border-radius: 6px; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Sección de TOTAL COMPACTA */
+    .total-container {
+        margin-top: 10px;
+        padding: 10px 16px; /* Reducido de 20px */
+        background: var(--g-light);
+        border-radius: 8px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 15px;
+    }
+
+    #totalLabel { font-size: 20px !important; font-weight: 800; color: var(--g-dark); } /* Reducido de 28px */
+
+    .btn-final {
+        padding: 8px 20px; /* Reducido de 12px 30px */
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 8px;
+    }
+</style>
+
+<div class="container py-3">
+    <div class="venta-card">
+        <div class="venta-header">
+            <div>
+                <h5 style="margin:0; color: var(--g-dark); font-weight: 700;">Nueva Venta</h5>
+                <small class="text-muted" style="font-size: 11px;">Factura: <strong>@Model.NumeroFactura</strong></small>
+            </div>
+            <a asp-page="Index" class="btn btn-sm btn-outline-secondary">
+                Volver
+            </a>
         </div>
-        <div class="card-body">
-            <div class="row g-2 mb-2">
-                <div class="col-md-5">
-                    <select id="productoSelect" class="form-select form-select-sm">
-                        <option value="">-- Seleccione producto --</option>
-                        @foreach (var p in Model.Productos)
-                        {
-                            <option value="@p.Id"
-                                    data-precio="@p.PrecioVenta"
-                                    data-nombre="@p.Nombre"
-                                    data-stock="@p.StockActual">
-                                @p.Nombre — @p.PrecioVenta.ToString("C") (Stock: @p.StockActual)
-                            </option>
-                        }
-                    </select>
+
+        <form method="post" id="ventaForm">
+            <input type="hidden" name="NumeroFactura" value="@Model.NumeroFactura" />
+
+            <div class="form-section">
+                <!-- Info Cliente/Empleado reducida -->
+                <div class="row g-2 mb-3">
+                    <div class="col-md-8">
+                        <label class="form-label">Cliente</label>
+                        <input name="ClienteNombre" class="form-control" placeholder="Consumidor Final" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Empleado</label>
+                        <select name="EmpleadoId" class="form-select">
+                            @foreach (var e in Model.Empleados) { <option value="@e.Id">@e.Nombre</option> }
+                        </select>
+                    </div>
                 </div>
-                <div class="col-md-2">
-                    <input type="number" id="cantidadInput" class="form-control form-control-sm"
-                           placeholder="Cantidad" min="1" value="1" />
+
+                <span class="section-title">Productos</span>
+                <div class="add-product-bar">
+                    <div>
+                        <label class="form-label">Producto</label>
+                        <select id="productoSelect" class="form-select">
+                            <option value="">Buscar...</option>
+                            @foreach (var p in Model.Productos) {
+                                <option value="@p.Id" data-precio="@p.PrecioVenta" data-nombre="@p.Nombre" data-stock="@p.StockActual">
+                                    @p.Nombre
+                                </option>
+                            }
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Cant.</label>
+                        <input type="number" id="cantidadInput" class="form-control" min="1" value="1" />
+                    </div>
+                    <div>
+                        <label class="form-label">Precio</label>
+                        <input type="text" id="precioInput" class="form-control" readonly style="background: #eee;" />
+                    </div>
+                    <div>
+                        <label class="form-label">Subtotal</label>
+                        <input type="text" id="subtotalInput" class="form-control" readonly style="background: #eee; font-weight: bold;" />
+                    </div>
+                    <button type="button" class="btn-add" onclick="agregarProducto()">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                    </button>
                 </div>
-                <div class="col-md-2">
-                    <input type="number" id="precioInput" class="form-control form-control-sm"
-                           placeholder="Precio" step="0.01" readonly />
+
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table class="table-detalles">
+                        <thead>
+                            <tr>
+                                <th>Descripción</th>
+                                <th style="width:100px">Cant.</th>
+                                <th>Unitario</th>
+                                <th>Subtotal</th>
+                                <th style="width:40px"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="detallesBody"></tbody>
+                    </table>
                 </div>
-                <div class="col-md-2">
-                    <input type="text" id="subtotalInput" class="form-control form-control-sm"
-                           placeholder="Subtotal" readonly />
+
+                <!-- Footer de Venta Compacto -->
+                <div class="total-container">
+                    <span style="font-size: 11px; color: var(--muted); font-weight: 700;">TOTAL A PAGAR:</span>
+                    <span id="totalLabel">$0.00</span>
                 </div>
-                <div class="col-md-1">
-                    <button type="button" class="btn btn-success btn-sm w-100" onclick="agregarProducto()">+</button>
+
+                <div id="hiddenInputs"></div>
+
+                <div class="mt-3 pt-3 border-top d-flex gap-2">
+                    <button type="submit" class="btn btn-final" id="btnGuardar" disabled 
+                            style="background: var(--g-bright); color: white; border: none;">
+                        Confirmar y Registrar Venta
+                    </button>
+                    <a asp-page="Index" class="btn btn-final btn-light">
+                        Cancelar
+                    </a>
                 </div>
             </div>
-
-            <!-- Tabla de detalles -->
-            <table class="table table-sm mb-0" id="tablaDetalles">
-                <thead class="table-light">
-                    <tr>
-                        <th>Producto</th>
-                        <th style="width:110px">Cantidad</th>
-                        <th>Precio</th>
-                        <th>Subtotal</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody id="detallesBody">
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="3" class="text-end fw-bold">Total:</td>
-                        <td class="text-success fw-bold" id="totalLabel">$0.00</td>
-                        <td></td>
-                    </tr>
-                </tfoot>
-            </table>
-
-            <!-- Inputs hidden para enviar al servidor -->
-            <div id="hiddenInputs"></div>
-        </div>
+        </form>
     </div>
-
-    <button type="submit" class="btn btn-success" id="btnGuardar" disabled>
-        Registrar Venta
-    </button>
-    <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
-</form>
+</div>
 
 @section Scripts {
 <script>
+    // Se mantiene la misma lógica de JavaScript anterior para que todo funcione
     let detalles = [];
-
     const productoSelect = document.getElementById('productoSelect');
     const cantidadInput  = document.getElementById('cantidadInput');
     const precioInput    = document.getElementById('precioInput');
     const subtotalInput  = document.getElementById('subtotalInput');
 
     productoSelect.addEventListener('change', function () {
-        const opt   = this.options[this.selectedIndex];
+        const opt = this.options[this.selectedIndex];
+        if(!opt.value) { precioInput.value = ""; subtotalInput.value = ""; return; }
         const precio = parseFloat(opt.dataset.precio) || 0;
-        precioInput.value   = precio.toFixed(2);
+        precioInput.value = precio.toFixed(2);
         calcularSubtotal();
     });
 
     cantidadInput.addEventListener('input', calcularSubtotal);
 
     function calcularSubtotal() {
-        const cant   = parseInt(cantidadInput.value)  || 0;
-        const precio = parseFloat(precioInput.value) || 0;
+        const opt = productoSelect.options[productoSelect.selectedIndex];
+        const cant = parseInt(cantidadInput.value) || 0;
+        const precio = parseFloat(opt?.dataset.precio) || 0;
         subtotalInput.value = (cant * precio).toFixed(2);
     }
 
     function agregarProducto() {
-        const opt      = productoSelect.options[productoSelect.selectedIndex];
-        if (!opt.value) { alert('Seleccione un producto'); return; }
-
+        const opt = productoSelect.options[productoSelect.selectedIndex];
+        if (!opt.value) return;
         const cantidad = parseInt(cantidadInput.value);
-        const stock    = parseInt(opt.dataset.stock);
-        if (cantidad < 1)       { alert('La cantidad debe ser mayor a 0'); return; }
-        if (cantidad > stock)   { alert(`Stock insuficiente. Disponible: ${stock}`); return; }
+        const stock = parseInt(opt.dataset.stock);
+        const precio = parseFloat(opt.dataset.precio);
 
-        const existente = detalles.find(d => d.productoId == opt.value);
-        if (existente) { alert('Este producto ya está en la lista. Edita la cantidad directamente en la tabla.'); return; }
+        if (cantidad < 1 || cantidad > stock) { alert("Cantidad inválida o stock insuficiente"); return; }
+        if (detalles.find(d => d.productoId == opt.value)) { alert("Ya está en la lista"); return; }
 
-        detalles.push({
-            productoId : opt.value,
-            nombre     : opt.dataset.nombre,
-            stock      : stock,
-            cantidad   : cantidad,
-            precio     : parseFloat(precioInput.value),
-            subtotal   : cantidad * parseFloat(precioInput.value)
-        });
-
+        detalles.push({ productoId: opt.value, nombre: opt.dataset.nombre, stock, cantidad, precio, subtotal: cantidad * precio });
         renderTabla();
-
-        // Limpiar
-        productoSelect.value = '';
-        cantidadInput.value  = 1;
-        precioInput.value    = '';
-        subtotalInput.value  = '';
-    }
-
-    function cambiarCantidad(index, valor) {
-        const cant  = parseInt(valor);
-        const stock = detalles[index].stock;
-
-        if (isNaN(cant) || cant < 1) {
-            document.getElementById(`cant-${index}`).value = detalles[index].cantidad;
-            return;
-        }
-        if (cant > stock) {
-            alert(`Stock insuficiente. Máximo disponible: ${stock}`);
-            document.getElementById(`cant-${index}`).value = detalles[index].cantidad;
-            return;
-        }
-
-        detalles[index].cantidad  = cant;
-        detalles[index].subtotal  = cant * detalles[index].precio;
-
-        // Actualizar subtotal en la fila sin rerenderizar toda la tabla
-        document.getElementById(`sub-${index}`).textContent = '$' + detalles[index].subtotal.toFixed(2);
-        actualizarTotal();
-        renderHiddens();
-    }
-
-    function eliminarDetalle(index) {
-        detalles.splice(index, 1);
-        renderTabla();
+        
+        productoSelect.value = ''; cantidadInput.value = 1; precioInput.value = ''; subtotalInput.value = '';
     }
 
     function renderTabla() {
@@ -188,45 +245,41 @@
         detalles.forEach((d, i) => {
             tbody.innerHTML += `
                 <tr>
-                    <td>${d.nombre}</td>
-                    <td>
-                        <input type="number"
-                               id="cant-${i}"
-                               class="form-control form-control-sm"
-                               value="${d.cantidad}"
-                               min="1"
-                               max="${d.stock}"
-                               onchange="cambiarCantidad(${i}, this.value)" />
-                    </td>
+                    <td><div style="font-weight:600">${d.nombre}</div></td>
+                    <td><input type="number" class="form-control form-control-sm" value="${d.cantidad}" onchange="actualizarCantidad(${i}, this.value)" style="height:28px"/></td>
                     <td>$${d.precio.toFixed(2)}</td>
-                    <td id="sub-${i}">$${d.subtotal.toFixed(2)}</td>
-                    <td>
-                        <button type="button" class="btn btn-danger btn-sm"
-                                onclick="eliminarDetalle(${i})">✕</button>
-                    </td>
+                    <td style="font-weight:700">$${d.subtotal.toFixed(2)}</td>
+                    <td class="text-end"><button type="button" class="btn btn-sm p-0 text-danger" onclick="eliminarDetalle(${i})">✕</button></td>
                 </tr>`;
         });
-
         actualizarTotal();
         renderHiddens();
         document.getElementById('btnGuardar').disabled = detalles.length === 0;
     }
 
-    function renderHiddens() {
-        const container = document.getElementById('hiddenInputs');
-        container.innerHTML = '';
-        detalles.forEach((d, i) => {
-            container.innerHTML += `
-                <input type="hidden" name="Detalles[${i}].ProductoId"     value="${d.productoId}" />
-                <input type="hidden" name="Detalles[${i}].Cantidad"        value="${d.cantidad}" />
-                <input type="hidden" name="Detalles[${i}].PrecioUnitario"  value="${d.precio}" />
-                <input type="hidden" name="Detalles[${i}].Subtotal"        value="${d.subtotal}" />`;
-        });
+    function actualizarCantidad(i, v) {
+        const c = parseInt(v);
+        if (c > detalles[i].stock || c < 1) { renderTabla(); return; }
+        detalles[i].cantidad = c; detalles[i].subtotal = c * detalles[i].precio;
+        renderTabla();
     }
+
+    function eliminarDetalle(i) { detalles.splice(i, 1); renderTabla(); }
 
     function actualizarTotal() {
         const total = detalles.reduce((sum, d) => sum + d.subtotal, 0);
-        document.getElementById('totalLabel').textContent = '$' + total.toFixed(2);
+        document.getElementById('totalLabel').textContent = '$' + total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+    }
+
+    function renderHiddens() {
+        const c = document.getElementById('hiddenInputs');
+        c.innerHTML = '';
+        detalles.forEach((d, i) => {
+            c.innerHTML += `<input type="hidden" name="Detalles[${i}].ProductoId" value="${d.productoId}" />
+                            <input type="hidden" name="Detalles[${i}].Cantidad" value="${d.cantidad}" />
+                            <input type="hidden" name="Detalles[${i}].PrecioUnitario" value="${d.precio}" />
+                            <input type="hidden" name="Detalles[${i}].Subtotal" value="${d.subtotal}" />`;
+        });
     }
 </script>
 }
