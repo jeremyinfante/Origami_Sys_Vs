@@ -19,13 +19,23 @@ namespace Origami_Sys.Pages.Usuario
 
         private async Task CargarSelectsAsync()
         {
-            // Solo empleados que no tienen usuario asignado aún
-            var empleadosConUsuario = await _context.Usuario.Select(u => u.EmpleadoId).ToListAsync();
-            var empleadosDisponibles = await _context.Empleado
-                .Where(e => e.Activo && !empleadosConUsuario.Contains(e.Id))
+            // Obtener IDs de empleados que ya tienen usuario asignado
+            var empleadosConUsuario = await _context.Usuario
+                .Select(u => u.EmpleadoId)
                 .ToListAsync();
 
-            EmpleadosSelect = new SelectList(empleadosDisponibles, "Id", "Nombre");
+            // Cargar empleados disponibles (activos y sin usuario) con nombre completo
+            var empleadosDisponibles = await _context.Empleado
+                .Where(e => e.Activo && !empleadosConUsuario.Contains(e.Id))
+                .Select(e => new
+                {
+                    e.Id,
+                    NombreCompleto = e.Nombre + " " + e.Apellido
+                })
+                .OrderBy(e => e.NombreCompleto)
+                .ToListAsync();
+
+            EmpleadosSelect = new SelectList(empleadosDisponibles, "Id", "NombreCompleto");
             RolesSelect = new SelectList(await _context.Roles.ToListAsync(), "Id", "Nombre");
         }
 
