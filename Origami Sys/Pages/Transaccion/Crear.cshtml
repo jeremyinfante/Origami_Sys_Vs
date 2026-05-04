@@ -5,45 +5,136 @@
     ViewData["Modulo"] = "Financiero";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="mb-0">Nueva Transacción</h5>
-    <a asp-page="Index" class="btn btn-sm btn-outline-secondary">← Volver</a>
-</div>
+<style>
+    :root {
+        --g-dark: #1a4332;
+        --g-bright: #10b981;
+        --g-light: #ecfdf5;
+        --border: #e5e7eb;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --bg: #f9fafb;
+    }
 
-<div class="card border-0 shadow-sm">
-    <div class="card-body">
-        <form method="post">
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label asp-for="Transaccion.Descripcion" class="form-label">Descripción</label>
-                    <input asp-for="Transaccion.Descripcion" class="form-control" />
-                    <span asp-validation-for="Transaccion.Descripcion" class="text-danger small"></span>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label asp-for="Transaccion.Monto" class="form-label">Monto</label>
-                    <input asp-for="Transaccion.Monto" class="form-control" />
-                    <span asp-validation-for="Transaccion.Monto" class="text-danger small"></span>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label asp-for="Transaccion.Fecha" class="form-label">Fecha</label>
-                    <input asp-for="Transaccion.Fecha" type="date" class="form-control" />
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label asp-for="Transaccion.Tipo" class="form-label">Tipo</label>
-                    <select asp-for="Transaccion.Tipo" class="form-select"
-                            asp-items="Html.GetEnumSelectList<Origami_Sys.Modelos.TipoTransaccion>()">
-                    </select>
-                </div>
+    .form-card {
+        background: white;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        /* Eliminado el max-width para que ocupe todo el ancho */
+        width: 100%; 
+        overflow: hidden;
+    }
+
+    .form-header {
+        background: var(--bg);
+        padding: 12px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .form-body {
+        padding: 16px 20px;
+    }
+
+    .section-title {
+        font-size: 10px;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: var(--muted);
+        letter-spacing: 0.5px;
+        margin-bottom: 15px;
+        display: block;
+    }
+
+    .form-label { 
+        font-weight: 600; 
+        color: var(--text); 
+        font-size: 12px; 
+        margin-bottom: 4px; 
+    }
+
+    .form-control, .form-select {
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-size: 13px;
+        height: 36px;
+        border: 1px solid var(--border);
+    }
+
+    .btn-action {
+        padding: 8px 20px;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 8px;
+    }
+
+    .btn-save { background: var(--g-dark); color: white; border: none; }
+    .btn-cancel { background: white; border: 1px solid var(--border); color: var(--muted); }
+</style>
+
+<!-- Cambiado a container-fluid para eliminar márgenes laterales del layout -->
+<div class="container-fluid py-3">
+    <div class="form-card">
+        <div class="form-header">
+            <div>
+                <h5 style="margin:0; color: var(--g-dark); font-weight: 700;">Registro de Transacción</h5>
+                <small class="text-muted" style="font-size: 11px;">Módulo Financiero</small>
             </div>
-            <button type="submit" class="btn btn-success">Guardar</button>
-            <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
-        </form>
+            <a asp-page="Index" class="btn btn-sm btn-outline-secondary" style="font-size: 11px; font-weight: 600;">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" class="me-1"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Volver
+            </a>
+        </div>
+
+        <div class="form-body">
+            <span class="section-title">Información General</span>
+            <form method="post">
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <label asp-for="Transaccion.Descripcion" class="form-label">Descripción del movimiento</label>
+                        <input asp-for="Transaccion.Descripcion" class="form-control" placeholder="Ej: Pago de servicios, Compra de suministros..." />
+                        <span asp-validation-for="Transaccion.Descripcion" class="text-danger" style="font-size: 11px;"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="Transaccion.Tipo" class="form-label">Tipo</label>
+                        <select asp-for="Transaccion.Tipo" class="form-select"
+                                asp-items="Html.GetEnumSelectList<Origami_Sys.Modelos.TipoTransaccion>()">
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="Transaccion.Monto" class="form-label">Monto</label>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-light border-end-0">$</span>
+                            <input asp-for="Transaccion.Monto" class="form-control border-start-0" placeholder="0.00" />
+                        </div>
+                        <span asp-validation-for="Transaccion.Monto" class="text-danger" style="font-size: 11px;"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="Transaccion.Fecha" class="form-label">Fecha de operación</label>
+                        <input asp-for="Transaccion.Fecha" type="date" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-top d-flex gap-2">
+                    <button type="submit" class="btn btn-action btn-save">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" class="me-1"><path d="M5 13l4 4L19 7"/></svg>
+                        Guardar Transacción
+                    </button>
+                    <a asp-page="Index" class="btn btn-action btn-cancel">
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }
