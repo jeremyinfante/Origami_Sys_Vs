@@ -5,37 +5,548 @@
     ViewData["Modulo"] = "RRHH";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="mb-0">Nómina</h5>
-    <a class="btn btn-sm btn-success" asp-page="Crear">+ Registrar Pago</a>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --g-dark: #1a4332;
+        --g-bright: #10b981;
+        --g-light: #ecfdf5;
+        --danger: #be123c;
+        --border: #e5e7eb;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --bg: #f9fafb;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* ── Toolbar ── */
+    .toolbar {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .search-wrap {
+        position: relative;
+        flex: 1;
+        min-width: 200px;
+    }
+    .search-wrap svg {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--muted);
+        pointer-events: none;
+    }
+    .search-wrap input {
+        width: 100%;
+        padding: 7px 12px 7px 34px;
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        font-size: 13px;
+        outline: none;
+        transition: border-color .15s, box-shadow .15s;
+    }
+    .search-wrap input:focus {
+        border-color: var(--g-bright);
+        box-shadow: 0 0 0 3px rgba(16,185,129,.1);
+    }
+    .toolbar select {
+        padding: 7px 10px;
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        font-size: 13px;
+        color: var(--text);
+        background: white;
+        cursor: pointer;
+        outline: none;
+    }
+    .toolbar select:focus {
+        border-color: var(--g-bright);
+        box-shadow: 0 0 0 3px rgba(16,185,129,.1);
+    }
+    .btn-nuevo {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--g-dark);
+        color: white;
+        border: none;
+        padding: 7px 16px;
+        border-radius: 7px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: background .15s, transform .1s;
+    }
+    .btn-nuevo:hover { background: #2d5a3d; color: white; transform: translateY(-1px); }
+
+    /* ── Stats cards ── */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+    .stat-card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 16px 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .stat-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--muted);
+        margin-bottom: 4px;
+    }
+    .stat-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--g-dark);
+    }
+    .stat-sub {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 2px;
+    }
+
+    /* ── Tabla ── */
+    .tabla-wrap {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .tabla-wrap table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+    .tabla-wrap thead th {
+        background: var(--bg);
+        padding: 10px 14px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        color: var(--muted);
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+    }
+    .tabla-wrap tbody tr {
+        border-bottom: 1px solid #f3f4f6;
+        transition: background .1s;
+    }
+    .tabla-wrap tbody tr:last-child { border-bottom: none; }
+    .tabla-wrap tbody tr:hover { background: #f0fdf4; }
+    .tabla-wrap td {
+        padding: 10px 14px;
+        color: var(--text);
+        vertical-align: middle;
+    }
+    .nombre-bold { font-weight: 600; color: var(--g-dark); }
+    
+    /* Badges */
+    .badge-pagado { background: #dcfce7; color: #166534; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+    .badge-pendiente { background: #fef3c7; color: #92400e; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+
+    /* Montos */
+    .monto-positivo { color: #059669; font-weight: 600; }
+    .monto-negativo { color: #dc2626; font-weight: 600; }
+    .monto-neto { font-weight: 700; color: var(--g-dark); font-size: 14px; }
+
+    /* Período */
+    .periodo-badge {
+        background: #f3f4f6;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    /* ── Acciones ── */
+    .acciones { display: flex; gap: 5px; white-space: nowrap; }
+    .btn-ac {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 4px 9px;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: opacity .15s, transform .1s;
+        border: none;
+        cursor: pointer;
+    }
+    .btn-ac:hover { opacity: .8; transform: translateY(-1px); }
+    .ac-ver  { background: #e8f5ef; color: #1e7a47; }
+    .ac-del  { background: #fde8e8; color: #c81e1e; }
+
+    /* ── Empty state ── */
+    .empty-state {
+        text-align: center;
+        padding: 48px 20px;
+        color: var(--muted);
+    }
+    .empty-state svg { margin-bottom: 12px; opacity: .3; }
+    .empty-state p { font-size: 14px; margin: 0; }
+
+    /* ── Contador ── */
+    .result-count {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 8px;
+        padding-left: 2px;
+    }
+
+    /* ── Modal ── */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.45);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+    .modal-content {
+        background: white;
+        border-radius: 14px;
+        width: 100%;
+        max-width: 400px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0,0,0,.2);
+        animation: slideUp .2s ease;
+    }
+    .modal-header-danger {
+        background: #be123c;
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: white;
+        font-weight: 700;
+        font-size: 14px;
+    }
+    .modal-body {
+        padding: 20px;
+    }
+    .modal-body p {
+        font-size: 13px;
+        color: #374151;
+        margin: 0 0 16px 0;
+    }
+    .modal-footer {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+    }
+    .btn-modal-cancel {
+        background: white;
+        border: 1px solid #e5e7eb;
+        color: #6b7280;
+        padding: 7px 16px;
+        border-radius: 7px;
+        font-size: 12px;
+        cursor: pointer;
+    }
+    .btn-modal-delete {
+        background: #be123c;
+        color: white;
+        border: none;
+        padding: 7px 16px;
+        border-radius: 7px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+</style>
+
+<div class="container-fluid py-3">
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <!-- Buscador -->
+        <div class="search-wrap">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+            <input type="text" id="buscador" placeholder="Buscar por empleado o período..." autocomplete="off" />
+        </div>
+
+        <!-- Filtro mes -->
+        <select id="filtroMes">
+            <option value="">Todos los meses</option>
+            <option value="1">Enero</option>
+            <option value="2">Febrero</option>
+            <option value="3">Marzo</option>
+            <option value="4">Abril</option>
+            <option value="5">Mayo</option>
+            <option value="6">Junio</option>
+            <option value="7">Julio</option>
+            <option value="8">Agosto</option>
+            <option value="9">Septiembre</option>
+            <option value="10">Octubre</option>
+            <option value="11">Noviembre</option>
+            <option value="12">Diciembre</option>
+        </select>
+
+        <!-- Ordenar -->
+        <select id="ordenar">
+            <option value="">Ordenar por...</option>
+            <option value="fecha-desc">Fecha más reciente</option>
+            <option value="fecha-asc">Fecha más antigua</option>
+            <option value="neto-desc">Salario neto ↑</option>
+            <option value="neto-asc">Salario neto ↓</option>
+            <option value="empleado-asc">Empleado A→Z</option>
+            <option value="empleado-desc">Empleado Z→A</option>
+        </select>
+
+        <a class="btn-nuevo" asp-page="Crear">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Registrar Pago
+        </a>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-row" id="statsRow">
+        <div class="stat-card">
+            <div class="stat-label">Total Pagado (Período)</div>
+            <div class="stat-value" id="statTotal">—</div>
+            <div class="stat-sub">Salarios netos acumulados</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Promedio por Empleado</div>
+            <div class="stat-value" id="statPromedio">—</div>
+            <div class="stat-sub">Salario neto promedio</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Total Deducciones</div>
+            <div class="stat-value" id="statDeducciones" style="color: #dc2626;">—</div>
+            <div class="stat-sub">Acumulado de deducciones</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Registros</div>
+            <div class="stat-value" id="statRegistros">—</div>
+            <div class="stat-sub">Pagos registrados</div>
+        </div>
+    </div>
+
+    <!-- Contador -->
+    <div class="result-count" id="resultCount"></div>
+
+    <!-- Tabla -->
+    <div class="tabla-wrap">
+        <table id="tablaNominas">
+            <thead>
+                <tr>
+                    <th>Empleado</th>
+                    <th>Período</th>
+                    <th>Salario Base</th>
+                    <th>Deducciones</th>
+                    <th>Salario Neto</th>
+                    <th>Fecha Pago</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tbody">
+                @foreach (var n in Model.Nominas)
+                {
+                    <tr data-empleado="@($"{n.Empleado?.Nombre} {n.Empleado?.Apellido}".ToLower())"
+                        data-mes="@n.FechaPago.Month"
+                        data-fecha="@n.FechaPago.ToString("yyyy-MM-dd")"
+                        data-neto="@n.SalarioNeto"
+                        data-deducciones="@n.Deducciones"
+                        data-salario="@n.SalarioPagado">
+                        <td>
+                            <span class="nombre-bold">@n.Empleado?.Nombre @n.Empleado?.Apellido</span>
+                        </td>
+                        <td>
+                            <span class="periodo-badge">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                                </svg>
+                                @n.PeriodoInicio.ToString("dd/MM/yy") - @n.PeriodoFin.ToString("dd/MM/yy")
+                            </span>
+                        </td>
+                        <td class="monto-positivo">@n.SalarioPagado.ToString("C")</td>
+                        <td class="monto-negativo">-@n.Deducciones.ToString("C")</td>
+                        <td><span class="monto-neto">@n.SalarioNeto.ToString("C")</span></td>
+                        <td>@n.FechaPago.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <span class="badge-pagado">Pagado</span>
+                        </td>
+                        <td>
+                            <div class="acciones">
+                                <button type="button" class="btn-ac ac-del" onclick="confirmarEliminar(@n.Id, '@Html.Raw($"{n.Empleado?.Nombre} {n.Empleado?.Apellido}")', '@n.PeriodoInicio.ToString("dd/MM/yy") - @n.PeriodoFin.ToString("dd/MM/yy")')">
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                                    Eliminar
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- Empty state -->
+        <div class="empty-state" id="emptyState" style="display:none">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            <p>No se encontraron registros de nómina con ese criterio.</p>
+        </div>
+    </div>
 </div>
 
-<table class="table table-striped table-sm">
-    <thead>
-        <tr>
-            <th>Empleado</th>
-            <th>Período</th>
-            <th>Salario Pagado</th>
-            <th>Deducciones</th>
-            <th>Salario Neto</th>
-            <th>Fecha Pago</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var n in Model.Nominas)
-        {
-            <tr>
-                <td>@n.Empleado?.Nombre @n.Empleado?.Apellido</td>
-                <td>@n.PeriodoInicio.ToString("dd/MM/yy") - @n.PeriodoFin.ToString("dd/MM/yy")</td>
-                <td>@n.SalarioPagado.ToString("C")</td>
-                <td>@n.Deducciones.ToString("C")</td>
-                <td><strong>@n.SalarioNeto.ToString("C")</strong></td>
-                <td>@n.FechaPago.ToString("dd/MM/yyyy")</td>
-                <td>
-                    <a class="btn btn-danger btn-sm" asp-page="Borrar" asp-route-id="@n.Id">Eliminar</a>
-                </td>
-            </tr>
+<!-- Modal de confirmación para eliminar -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal-content">
+        <div class="modal-header-danger">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            Confirmar eliminación
+        </div>
+        <div class="modal-body">
+            <p>¿Eliminar el pago de <strong id="modalEmpleado"></strong> del período <strong id="modalPeriodo"></strong>? Esta acción no se puede deshacer.</p>
+            <div class="modal-footer">
+                <button onclick="cerrarModal()" class="btn-modal-cancel">Cancelar</button>
+                <form method="post" asp-page-handler="Eliminar" id="formEliminar" style="margin:0">
+                    <input type="hidden" name="id" id="modalId" />
+                    <button type="submit" class="btn-modal-delete">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const filas = () => [...document.querySelectorAll('#tbody tr')];
+
+    function formatearMoneda(valor) {
+        return valor.toLocaleString('es-DO', { style: 'currency', currency: 'DOP' });
+    }
+
+    // ── Filtrar y ordenar ──
+    function aplicar() {
+        const q     = document.getElementById('buscador').value.toLowerCase().trim();
+        const mes   = document.getElementById('filtroMes').value;
+        const orden = document.getElementById('ordenar').value;
+
+        let visibles = filas().filter(tr => {
+            const empleado = tr.dataset.empleado;
+            const trMes    = tr.dataset.mes;
+
+            const matchQ   = !q || empleado.includes(q);
+            const matchMes = !mes || trMes === mes;
+            return matchQ && matchMes;
+        });
+
+        // Ocultar todas
+        filas().forEach(tr => tr.style.display = 'none');
+
+        // Ordenar
+        if (orden) {
+            const [campo, dir] = orden.split('-');
+            visibles.sort((a, b) => {
+                let va, vb;
+                if (campo === 'empleado') {
+                    va = a.dataset.empleado;
+                    vb = b.dataset.empleado;
+                    return dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+                } else if (campo === 'fecha') {
+                    va = new Date(a.dataset.fecha);
+                    vb = new Date(b.dataset.fecha);
+                } else if (campo === 'neto') {
+                    va = parseFloat(a.dataset.neto);
+                    vb = parseFloat(b.dataset.neto);
+                }
+                return dir === 'asc' ? va - vb : vb - va;
+            });
+            const tbody = document.getElementById('tbody');
+            visibles.forEach(tr => tbody.appendChild(tr));
         }
-    </tbody>
-</table>
+
+        // Mostrar visibles
+        visibles.forEach(tr => tr.style.display = '');
+
+        // Empty state
+        document.getElementById('emptyState').style.display = visibles.length === 0 ? '' : 'none';
+
+        // Contador
+        const total = filas().length;
+        document.getElementById('resultCount').textContent =
+            visibles.length === total
+                ? `${total} registro(s)`
+                : `Mostrando ${visibles.length} de ${total} registro(s)`;
+
+        // Actualizar stats
+        actualizarStats(visibles);
+    }
+
+    function actualizarStats(visibles) {
+        const totalNeto = visibles.reduce((sum, tr) => sum + parseFloat(tr.dataset.neto), 0);
+        const totalDeducciones = visibles.reduce((sum, tr) => sum + parseFloat(tr.dataset.deducciones), 0);
+        const promedio = visibles.length > 0 ? totalNeto / visibles.length : 0;
+
+        document.getElementById('statTotal').textContent = formatearMoneda(totalNeto);
+        document.getElementById('statPromedio').textContent = formatearMoneda(promedio);
+        document.getElementById('statDeducciones').textContent = formatearMoneda(totalDeducciones);
+        document.getElementById('statRegistros').textContent = visibles.length;
+    }
+
+    ['buscador','filtroMes','ordenar'].forEach(id =>
+        document.getElementById(id).addEventListener('input', aplicar)
+    );
+
+    // ── Modal eliminar ──
+    const deleteModal = document.getElementById('deleteModal');
+
+    function confirmarEliminar(id, empleado, periodo) {
+        document.getElementById('modalEmpleado').textContent = empleado;
+        document.getElementById('modalPeriodo').textContent = periodo;
+        document.getElementById('modalId').value = id;
+        deleteModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarModal() {
+        deleteModal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    deleteModal.addEventListener('mousedown', e => { if (e.target === deleteModal) cerrarModal(); });
+
+    // Animación del modal
+    const styleEl = document.createElement('style');
+    styleEl.textContent = `@@keyframes slideUp { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }`;
+    document.head.appendChild(styleEl);
+
+    // Inicializar
+    aplicar();
+</script>
+}

@@ -5,50 +5,395 @@
     ViewData["Modulo"] = "RRHH";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="mb-0">Registrar Pago de Nómina</h5>
-    <a asp-page="Index" class="btn btn-sm btn-outline-secondary">← Volver</a>
-</div>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-<div class="card border-0 shadow-sm">
-    <div class="card-body">
-        <form method="post">
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label asp-for="Nomina.EmpleadoId" class="form-label">Empleado</label>
-                    <select asp-for="Nomina.EmpleadoId" asp-items="Model.EmpleadosSelect"
-                            class="form-select" id="empleadoSelect">
-                        <option value="">-- Seleccione --</option>
-                    </select>
-                    <span asp-validation-for="Nomina.EmpleadoId" class="text-danger small"></span>
+<style>
+    :root {
+        --brand-green: #1a4332;
+        --brand-green-bright: #10b981;
+        --brand-green-light: #f0fdf4;
+        --border-color: #e5e7eb;
+        --text-main: #1f2937;
+        --text-muted: #6b7280;
+        --bg-body: #f3f4f6;
+        --danger: #be123c;
+    }
+
+    body {
+        background-color: var(--bg-body);
+        font-family: 'Inter', sans-serif;
+        color: var(--text-main);
+        font-size: 14px;
+    }
+
+    .main-wrapper-fluid {
+        width: 100%;
+        padding: 1.5rem 2rem;
+    }
+
+    /* Header */
+    .header-minimal {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+        .header-minimal h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--brand-green);
+            letter-spacing: -0.02em;
+        }
+
+    .breadcrumb-text {
+        font-size: 11px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+    }
+
+    /* Tarjeta Principal */
+    .card-clean {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Seccionado */
+    .form-section-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--brand-green-bright);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin: 1.5rem 0 1rem 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .form-section-label::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #f1f5f9;
+        }
+
+    .form-label {
+        font-weight: 500;
+        font-size: 13px;
+        margin-bottom: 6px;
+        color: #374151;
+    }
+
+    .form-control, .form-select {
+        font-size: 14px;
+        padding: 0.6rem 0.8rem;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        transition: all 0.2s ease;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--brand-green-bright);
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+            outline: none;
+        }
+
+        .form-control:read-only {
+            background-color: #f9fafb;
+            cursor: not-allowed;
+        }
+
+    /* Input group */
+    .input-group-text {
+        background-color: #f9fafb;
+        border: 1px solid var(--border-color);
+        font-weight: 600;
+        color: var(--text-muted);
+    }
+
+    /* Resumen de nómina */
+    .resumen-card {
+        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+        border: 1px solid #d1fae5;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .resumen-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .resumen-item {
+        text-align: center;
+    }
+
+        .resumen-item .label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .resumen-item .valor {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--brand-green);
+        }
+
+            .resumen-item .valor.neto {
+                font-size: 24px;
+                color: #059669;
+            }
+
+    .resumen-empleado {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #d1fae5;
+        margin-bottom: 1rem;
+    }
+
+        .resumen-empleado .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--brand-green-bright);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .resumen-empleado .info {
+            flex: 1;
+        }
+
+        .resumen-empleado .nombre {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .resumen-empleado .detalle {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+    /* Alerta de advertencia */
+    .alert-warning-custom {
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        color: #92400e;
+    }
+
+        .alert-warning-custom svg {
+            flex-shrink: 0;
+        }
+
+    /* Botones */
+    .btn-save {
+        background-color: var(--brand-green-bright);
+        color: white;
+        border: none;
+        padding: 0.6rem 2rem;
+        font-size: 14px;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .btn-save:hover {
+            background-color: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+            color: white;
+        }
+
+    .btn-cancel {
+        background-color: #fff;
+        color: var(--text-muted);
+        border: 1px solid var(--border-color);
+        padding: 0.6rem 1.5rem;
+        font-size: 14px;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+
+        .btn-cancel:hover {
+            background-color: #f9fafb;
+            border-color: #d1d5db;
+            color: var(--text-main);
+        }
+</style>
+
+<div class="main-wrapper-fluid">
+    <!-- Header -->
+    <div class="header-minimal">
+        <div>
+            <div class="breadcrumb-text">@ViewData["Modulo"] / Nómina</div>
+            <h1>Registrar Pago de Nómina</h1>
+        </div>
+        <a asp-page="Index" class="btn-cancel text-decoration-none d-flex align-items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+            Volver al listado
+        </a>
+    </div>
+
+    <!-- Card Formulario -->
+    <div class="card-clean">
+        <div class="card-body p-4 p-lg-5">
+            <form method="post" id="nominaForm">
+                
+                <!-- SECCIÓN 1: EMPLEADO Y PERÍODO -->
+                <div class="form-section-label">Empleado y Período</div>
+                <div class="row g-4 mb-4">
+                    <div class="col-xl-6 col-md-6">
+                        <label asp-for="Nomina.EmpleadoId" class="form-label">Empleado <span class="text-danger">*</span></label>
+                        <select asp-for="Nomina.EmpleadoId" asp-items="Model.EmpleadosSelect"
+                                class="form-select" id="empleadoSelect">
+                            <option value="">-- Seleccione un empleado --</option>
+                        </select>
+                        <span asp-validation-for="Nomina.EmpleadoId" class="text-danger" style="font-size:11px"></span>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <label asp-for="Nomina.PeriodoInicio" class="form-label">Período Inicio <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                    <line x1="16" y1="2" x2="16" y2="6" />
+                                    <line x1="8" y1="2" x2="8" y2="6" />
+                                    <line x1="3" y1="10" x2="21" y2="10" />
+                                </svg>
+                            </span>
+                            <input asp-for="Nomina.PeriodoInicio" type="date" class="form-control" id="periodoInicio" />
+                        </div>
+                        <span asp-validation-for="Nomina.PeriodoInicio" class="text-danger" style="font-size:11px"></span>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <label asp-for="Nomina.PeriodoFin" class="form-label">Período Fin <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                    <line x1="16" y1="2" x2="16" y2="6" />
+                                    <line x1="8" y1="2" x2="8" y2="6" />
+                                    <line x1="3" y1="10" x2="21" y2="10" />
+                                </svg>
+                            </span>
+                            <input asp-for="Nomina.PeriodoFin" type="date" class="form-control" id="periodoFin" />
+                        </div>
+                        <span asp-validation-for="Nomina.PeriodoFin" class="text-danger" style="font-size:11px"></span>
+                    </div>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <label asp-for="Nomina.PeriodoInicio" class="form-label">Período Inicio</label>
-                    <input asp-for="Nomina.PeriodoInicio" type="date" class="form-control" />
-                    <span asp-validation-for="Nomina.PeriodoInicio" class="text-danger small"></span>
+
+                <!-- SECCIÓN 2: MONTOS -->
+                <div class="form-section-label">Montos del Pago</div>
+                
+                <!-- Alerta de advertencia (oculta por defecto) -->
+                <div class="alert-warning-custom" id="alertaDeducciones" style="display:none;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                        <line x1="12" y1="9" x2="12" y2="13" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                    </svg>
+                    <span>Las deducciones superan el 40% del salario base. Verifique los montos antes de guardar.</span>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <label asp-for="Nomina.PeriodoFin" class="form-label">Período Fin</label>
-                    <input asp-for="Nomina.PeriodoFin" type="date" class="form-control" />
-                    <span asp-validation-for="Nomina.PeriodoFin" class="text-danger small"></span>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-xl-4 col-md-6">
+                        <label asp-for="Nomina.SalarioPagado" class="form-label">Salario Base <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input asp-for="Nomina.SalarioPagado" class="form-control fw-bold" id="salarioPagado" placeholder="0.00" />
+                        </div>
+                        <span asp-validation-for="Nomina.SalarioPagado" class="text-danger" style="font-size:11px"></span>
+                    </div>
+                    <div class="col-xl-4 col-md-6">
+                        <label asp-for="Nomina.Deducciones" class="form-label">Deducciones</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input asp-for="Nomina.Deducciones" class="form-control" id="deducciones" value="0" placeholder="0.00" />
+                        </div>
+                        <div class="text-muted mt-1" style="font-size:11px;">
+                            <span id="porcentajeDeducciones">0%</span> del salario base
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-md-6">
+                        <label asp-for="Nomina.SalarioNeto" class="form-label">Salario Neto</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input asp-for="Nomina.SalarioNeto" class="form-control fw-bold text-success" id="salarioNeto" readonly />
+                        </div>
+                        <span asp-validation-for="Nomina.SalarioNeto" class="text-danger" style="font-size:11px"></span>
+                    </div>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <label asp-for="Nomina.SalarioPagado" class="form-label">Salario Pagado</label>
-                    <input asp-for="Nomina.SalarioPagado" class="form-control" id="salarioPagado" />
-                    <span asp-validation-for="Nomina.SalarioPagado" class="text-danger small"></span>
+
+                <!-- SECCIÓN 3: RESUMEN -->
+                <div class="form-section-label">Resumen del Pago</div>
+                <div class="resumen-card" id="resumenCard">
+                    <div class="resumen-empleado" id="resumenEmpleado">
+                        <div class="avatar" id="avatarEmpleado">?</div>
+                        <div class="info">
+                            <div class="nombre" id="nombreEmpleado">No seleccionado</div>
+                            <div class="detalle" id="detalleEmpleado">Seleccione un empleado para continuar</div>
+                        </div>
+                    </div>
+                    <div class="resumen-grid">
+                        <div class="resumen-item">
+                            <div class="label">Salario Base</div>
+                            <div class="valor" id="resumenBase">$0.00</div>
+                        </div>
+                        <div class="resumen-item">
+                            <div class="label">Deducciones</div>
+                            <div class="valor" style="color: #dc2626;" id="resumenDeducciones">$0.00</div>
+                        </div>
+                        <div class="resumen-item">
+                            <div class="label">Salario Neto</div>
+                            <div class="valor neto" id="resumenNeto">$0.00</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <label asp-for="Nomina.Deducciones" class="form-label">Deducciones</label>
-                    <input asp-for="Nomina.Deducciones" class="form-control" id="deducciones" value="0" />
+
+                <!-- ACCIONES -->
+                <div class="d-flex justify-content-between align-items-center pt-4 mt-4 border-top">
+                    <span class="text-muted" style="font-size: 13px;">Los campos marcados con <span class="text-danger">*</span> son obligatorios</span>
+                    <div class="d-flex gap-3">
+                        <a asp-page="Index" class="btn-cancel text-decoration-none">Cancelar</a>
+                        <button type="submit" class="btn-save">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9" /><path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9" /><polyline points="7 12 10 15 13 12" /></svg>
+                            Registrar Pago
+                        </button>
+                    </div>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <label asp-for="Nomina.SalarioNeto" class="form-label">Salario Neto</label>
-                    <input asp-for="Nomina.SalarioNeto" class="form-control" id="salarioNeto" readonly />
-                </div>
-            </div>
-            <button type="submit" class="btn btn-success">Guardar</button>
-            <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
-        </form>
+
+            </form>
+        </div>
     </div>
 </div>
 
@@ -57,23 +402,90 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script>
-        // Calcula salario neto automáticamente
+        const salarios = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SalariosEmpleados));
+        // Mapeo de empleados: id -> { nombre, apellido, salario }
+        const empleadosMap = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                    Model.EmpleadosSelect.Select(e => new
+                    {
+                            Id = e.Value,
+                            Nombre = e.Text
+                    }).ToDictionary(e => e.Id, e => e.Nombre)
+            ));
+
+        function formatearMoneda(valor) {
+            return '$' + valor.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        }
+
         function calcularNeto() {
             const pagado = parseFloat(document.getElementById('salarioPagado').value) || 0;
             const deducciones = parseFloat(document.getElementById('deducciones').value) || 0;
-            document.getElementById('salarioNeto').value = (pagado - deducciones).toFixed(2);
+            const neto = pagado - deducciones;
+            
+            document.getElementById('salarioNeto').value = neto.toFixed(2);
+            
+            // Actualizar resumen
+            document.getElementById('resumenBase').textContent = formatearMoneda(pagado);
+            document.getElementById('resumenDeducciones').textContent = formatearMoneda(deducciones);
+            document.getElementById('resumenNeto').textContent = formatearMoneda(neto < 0 ? 0 : neto);
+            
+            // Calcular porcentaje de deducciones
+            const porcentaje = pagado > 0 ? (deducciones / pagado * 100) : 0;
+            document.getElementById('porcentajeDeducciones').textContent = porcentaje.toFixed(1) + '%';
+            
+            // Mostrar alerta si las deducciones superan el 40%
+            const alerta = document.getElementById('alertaDeducciones');
+            if (porcentaje > 40) {
+                alerta.style.display = 'flex';
+            } else {
+                alerta.style.display = 'none';
+            }
+            
+            // Cambiar color del neto si es negativo
+            const netoInput = document.getElementById('salarioNeto');
+            if (neto < 0) {
+                netoInput.classList.add('text-danger');
+                netoInput.classList.remove('text-success');
+            } else {
+                netoInput.classList.remove('text-danger');
+                netoInput.classList.add('text-success');
+            }
         }
+
+        function actualizarResumenEmpleado() {
+            const select = document.getElementById('empleadoSelect');
+            const id = select.value;
+            const nombreCompleto = empleadosMap[id] || '';
+            const avatar = document.getElementById('avatarEmpleado');
+            const nombreEl = document.getElementById('nombreEmpleado');
+            const detalleEl = document.getElementById('detalleEmpleado');
+            
+            if (id && nombreCompleto) {
+                const iniciales = nombreCompleto.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                avatar.textContent = iniciales;
+                nombreEl.textContent = nombreCompleto;
+                detalleEl.textContent = 'Salario base: ' + formatearMoneda(salarios[id] || 0);
+            } else {
+                avatar.textContent = '?';
+                nombreEl.textContent = 'No seleccionado';
+                detalleEl.textContent = 'Seleccione un empleado para continuar';
+            }
+        }
+
+        // Event listeners
         document.getElementById('salarioPagado').addEventListener('input', calcularNeto);
         document.getElementById('deducciones').addEventListener('input', calcularNeto);
 
-        // Carga el salario base del empleado seleccionado
-        const salarios = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SalariosEmpleados));
         document.getElementById('empleadoSelect').addEventListener('change', function() {
             const id = this.value;
             if (salarios[id]) {
                 document.getElementById('salarioPagado').value = salarios[id];
                 calcularNeto();
             }
+            actualizarResumenEmpleado();
         });
+
+        // Cálculo inicial
+        calcularNeto();
+        actualizarResumenEmpleado();
     </script>
 }
