@@ -5,51 +5,595 @@
     ViewData["Modulo"] = "RRHH";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="mb-0">Editar Empleado</h5>
-    <a asp-page="Index" class="btn btn-sm btn-outline-secondary">← Volver</a>
-</div>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-<div class="card border-0 shadow-sm">
-    <div class="card-body">
-        <form method="post">
-            <input type="hidden" asp-for="Empleado.Id" />
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label asp-for="Empleado.Cedula" class="form-label">Cédula</label>
-                    <input asp-for="Empleado.Cedula" class="form-control" />
-                    <span asp-validation-for="Empleado.Cedula" class="text-danger small"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label asp-for="Empleado.Telefono" class="form-label">Teléfono</label>
-                    <input asp-for="Empleado.Telefono" class="form-control" />
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label asp-for="Empleado.Nombre" class="form-label">Nombre</label>
-                    <input asp-for="Empleado.Nombre" class="form-control" />
-                    <span asp-validation-for="Empleado.Nombre" class="text-danger small"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label asp-for="Empleado.Apellido" class="form-label">Apellido</label>
-                    <input asp-for="Empleado.Apellido" class="form-control" />
-                    <span asp-validation-for="Empleado.Apellido" class="text-danger small"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label asp-for="Empleado.SalarioBase" class="form-label">Salario Base</label>
-                    <input asp-for="Empleado.SalarioBase" class="form-control" />
-                    <span asp-validation-for="Empleado.SalarioBase" class="text-danger small"></span>
-                </div>
-                <div class="col-md-6 mb-3 d-flex align-items-end">
-                    <div class="form-check mb-2">
-                        <input asp-for="Empleado.Activo" class="form-check-input" type="checkbox" />
-                        <label asp-for="Empleado.Activo" class="form-check-label">Activo</label>
+<style>
+    :root {
+        --brand-green: #1a4332;
+        --brand-green-bright: #10b981;
+        --brand-green-light: #f0fdf4;
+        --brand-blue: #3b82f6;
+        --brand-blue-light: #eff6ff;
+        --border-color: #e5e7eb;
+        --text-main: #1f2937;
+        --text-muted: #6b7280;
+        --bg-body: #f3f4f6;
+    }
+
+    body {
+        background-color: var(--bg-body);
+        font-family: 'Inter', sans-serif;
+        color: var(--text-main);
+        font-size: 14px;
+    }
+
+    .main-wrapper-fluid {
+        width: 100%;
+        padding: 1.5rem 2rem;
+    }
+
+    /* Header */
+    .header-minimal {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .header-minimal h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+        color: var(--brand-green);
+        letter-spacing: -0.02em;
+    }
+
+    .breadcrumb-text {
+        font-size: 11px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+    }
+
+    /* Badge de ID */
+    .id-badge {
+        background: var(--brand-green-light);
+        color: var(--brand-green);
+        font-size: 12px;
+        font-weight: 600;
+        padding: 4px 12px;
+        border-radius: 20px;
+        border: 1px solid #d1fae5;
+    }
+
+    /* Tarjeta Principal */
+    .card-clean {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Alerta de edición */
+    .edit-notice {
+        background: var(--brand-blue-light);
+        border: 1px solid #bfdbfe;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        color: #1e40af;
+    }
+
+    .edit-notice svg {
+        flex-shrink: 0;
+    }
+
+    /* Seccionado */
+    .form-section-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--brand-green-bright);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin: 1.5rem 0 1rem 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .form-section-label::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #f1f5f9;
+    }
+
+    .form-label {
+        font-weight: 500;
+        font-size: 13px;
+        margin-bottom: 6px;
+        color: #374151;
+    }
+
+    .form-control, .form-select {
+        font-size: 14px;
+        padding: 0.6rem 0.8rem;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        transition: all 0.2s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--brand-green-bright);
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+        outline: none;
+    }
+
+    /* Campo modificado */
+    .form-control.modified {
+        border-color: #fbbf24;
+        background-color: #fffbeb;
+    }
+
+    /* Checkbox personalizado */
+    .checkbox-wrapper {
+        background-color: #fafafa;
+        border-radius: 10px;
+        padding: 1rem 1.25rem;
+        border: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        height: 100%;
+    }
+
+    .form-check-input {
+        width: 1.2em;
+        height: 1.2em;
+        margin-right: 0.5rem;
+        border: 2px solid var(--border-color);
+        cursor: pointer;
+    }
+
+    .form-check-input:checked {
+        background-color: var(--brand-green-bright);
+        border-color: var(--brand-green-bright);
+    }
+
+    .form-check-label {
+        font-weight: 500;
+        font-size: 14px;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    /* Input group para salario */
+    .input-group-text {
+        background-color: #f9fafb;
+        border: 1px solid var(--border-color);
+        font-weight: 600;
+        color: var(--text-muted);
+    }
+
+    /* Estado activo visual */
+    .status-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-left: 8px;
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+
+    .status-dot.active {
+        background-color: #10b981;
+        animation: pulse 2s infinite;
+    }
+
+    .status-dot.inactive {
+        background-color: #6b7280;
+    }
+
+    @@keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+        70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    /* Resumen de cambios */
+    .changes-summary {
+        background-color: #fffbeb;
+        border: 1px solid #fde68a;
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        display: none;
+    }
+
+    .changes-summary.visible {
+        display: block;
+    }
+
+    .change-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid #fef3c7;
+        font-size: 13px;
+    }
+
+    .change-item:last-child {
+        border-bottom: none;
+    }
+
+    .change-old {
+        color: #dc2626;
+        text-decoration: line-through;
+        margin-right: 8px;
+    }
+
+    .change-new {
+        color: #059669;
+        font-weight: 600;
+    }
+
+    .change-arrow {
+        color: var(--text-muted);
+        margin: 0 8px;
+    }
+
+    /* Botones */
+    .btn-save {
+        background-color: var(--brand-blue);
+        color: white;
+        border: none;
+        padding: 0.6rem 2rem;
+        font-size: 14px;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-save:hover {
+        background-color: #2563eb;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        color: white;
+    }
+
+    .btn-cancel {
+        background-color: #fff;
+        color: var(--text-muted);
+        border: 1px solid var(--border-color);
+        padding: 0.6rem 1.5rem;
+        font-size: 14px;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+
+    .btn-cancel:hover {
+        background-color: #f9fafb;
+        border-color: #d1d5db;
+        color: var(--text-main);
+    }
+
+    .btn-delete {
+        background-color: #fff;
+        color: #dc2626;
+        border: 1px solid #fecaca;
+        padding: 0.6rem 1.5rem;
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-delete:hover {
+        background-color: #fef2f2;
+        border-color: #dc2626;
+        color: #dc2626;
+    }
+</style>
+
+<div class="main-wrapper-fluid">
+    <!-- Header -->
+    <div class="header-minimal">
+        <div>
+            <div class="breadcrumb-text">@ViewData["Modulo"] / Personal</div>
+            <h1 class="d-flex align-items-center gap-3">
+                Editar Empleado
+                <span class="id-badge">ID: @Model.Empleado.Id</span>
+            </h1>
+        </div>
+        <a asp-page="Index" class="btn-cancel text-decoration-none d-flex align-items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+            Volver al listado
+        </a>
+    </div>
+
+    <!-- Aviso de edición -->
+    <div class="edit-notice">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <div>
+            <strong>Estás editando un registro existente.</strong> Los cambios se guardarán inmediatamente al hacer clic en "Actualizar Empleado".
+        </div>
+    </div>
+
+    <!-- Card Formulario -->
+    <div class="card-clean">
+        <div class="card-body p-4 p-lg-5">
+            <form method="post" id="editForm">
+                <input type="hidden" asp-for="Empleado.Id" />
+                
+                <!-- SECCIÓN 1: IDENTIFICACIÓN -->
+                <div class="form-section-label">Identificación Personal</div>
+                <div class="row g-4 mb-4">
+                    <div class="col-xl-4 col-md-6">
+                        <label asp-for="Empleado.Cedula" class="form-label">Cédula de Identidad <span class="text-danger">*</span></label>
+                        <input asp-for="Empleado.Cedula" class="form-control" data-original="@Model.Empleado.Cedula" />
+                        <span asp-validation-for="Empleado.Cedula" class="text-danger" style="font-size:11px"></span>
+                    </div>
+                    <div class="col-xl-4 col-md-6">
+                        <label asp-for="Empleado.Nombre" class="form-label">Nombre(s) <span class="text-danger">*</span></label>
+                        <input asp-for="Empleado.Nombre" class="form-control" data-original="@Model.Empleado.Nombre" />
+                        <span asp-validation-for="Empleado.Nombre" class="text-danger" style="font-size:11px"></span>
+                    </div>
+                    <div class="col-xl-4 col-md-6">
+                        <label asp-for="Empleado.Apellido" class="form-label">Apellido(s) <span class="text-danger">*</span></label>
+                        <input asp-for="Empleado.Apellido" class="form-control" data-original="@Model.Empleado.Apellido" />
+                        <span asp-validation-for="Empleado.Apellido" class="text-danger" style="font-size:11px"></span>
                     </div>
                 </div>
-            </div>
-            <button type="submit" class="btn btn-primary">Actualizar</button>
-            <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
-        </form>
+
+                <!-- SECCIÓN 2: CONTACTO Y CONTRATACIÓN -->
+                <div class="form-section-label">Información de Contacto y Contratación</div>
+                <div class="row g-4 mb-4">
+                    <div class="col-xl-4 col-md-6">
+                        <label asp-for="Empleado.Telefono" class="form-label">Teléfono de Contacto</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.568 17.568 0 0 0 4.168 6.608 17.569 17.569 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.678.678 0 0 0-.58-.122l-2.19.547a1.745 1.745 0 0 1-1.657-.459L5.482 8.062a1.745 1.745 0 0 1-.46-1.657l.548-2.19a.678.678 0 0 0-.122-.58L3.654 1.328z"/></svg>
+                            </span>
+                            <input asp-for="Empleado.Telefono" class="form-control" data-original="@Model.Empleado.Telefono" />
+                        </div>
+                    </div>
+                    <div class="col-xl-4 col-md-6">
+                        <label asp-for="Empleado.SalarioBase" class="form-label">Salario Base <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input asp-for="Empleado.SalarioBase" class="form-control fw-bold" data-original="@Model.Empleado.SalarioBase" />
+                        </div>
+                        <span asp-validation-for="Empleado.SalarioBase" class="text-danger" style="font-size:11px"></span>
+                    </div>
+                    <div class="col-xl-4 col-md-6">
+                        <label class="form-label">Estado del Empleado</label>
+                        <div class="checkbox-wrapper">
+                            <input asp-for="Empleado.Activo" class="form-check-input" type="checkbox" id="checkActivo" data-original="@Model.Empleado.Activo.ToString().ToLower()" />
+                            <label asp-for="Empleado.Activo" class="form-check-label" for="checkActivo">
+                                Empleado Activo
+                            </label>
+                            <span class="status-indicator">
+                                <span class="status-dot @(Model.Empleado.Activo ? "active" : "inactive")" id="statusDot"></span>
+                                <small id="statusText" style="font-weight: 600; color: @(Model.Empleado.Activo ? "#10b981" : "#6b7280")">
+                                    @(Model.Empleado.Activo ? "Activo" : "Inactivo")
+                                </small>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 3: RESUMEN DE CAMBIOS -->
+                <div class="changes-summary" id="changesSummary">
+                    <div class="form-section-label" style="margin-top: 0;">Cambios Detectados</div>
+                    <div id="changesList"></div>
+                </div>
+
+                <!-- ACCIONES -->
+                <div class="d-flex justify-content-between align-items-center pt-4 border-top">
+                    <div>
+                        <button type="button" class="btn-delete" onclick="confirmarEliminacion()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+                            Eliminar Empleado
+                        </button>
+                    </div>
+                    <div class="d-flex gap-3">
+                        <a asp-page="Index" class="btn-cancel text-decoration-none">Cancelar</a>
+                        <button type="submit" class="btn-save">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                            Actualizar Empleado
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
     </div>
 </div>
 
-@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }
+<!-- Modal de confirmación para eliminar -->
+<div id="deleteModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:1000; align-items:center; justify-content:center;">
+    <div style="background:white; border-radius:14px; width:100%; max-width:400px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.2); animation:slideUp .2s ease">
+        <div style="background:#be123c; padding:16px 20px; display:flex; align-items:center; gap:10px">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <div style="color:white; font-weight:700; font-size:14px">Confirmar eliminación</div>
+        </div>
+        <div style="padding:20px">
+            <p style="font-size:13px; color:#374151; margin:0 0 16px 0">
+                ¿Eliminar a <strong>@Model.Empleado.Nombre @Model.Empleado.Apellido</strong>? Esta acción no se puede deshacer.
+            </p>
+            <div style="display:flex; gap:8px; justify-content:flex-end">
+                <button onclick="cerrarModal()" style="background:white; border:1px solid #e5e7eb; color:#6b7280; padding:7px 16px; border-radius:7px; font-size:12px; cursor:pointer">
+                    Cancelar
+                </button>
+                <form method="post" asp-page-handler="Eliminar" style="margin:0">
+                    <input type="hidden" name="id" value="@Model.Empleado.Id" />
+                    <button type="submit" style="background:#be123c; color:white; border:none; padding:7px 16px; border-radius:7px; font-size:12px; font-weight:600; cursor:pointer">
+                        Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    
+    <script>
+        // Detectar cambios en el formulario
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('editForm');
+            const inputs = form.querySelectorAll('[data-original]');
+            const checkActivo = document.getElementById('checkActivo');
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            const changesSummary = document.getElementById('changesSummary');
+            const changesList = document.getElementById('changesList');
+            
+            // Mapeo de nombres de campos
+            const fieldNames = {
+                'Empleado_Cedula': 'Cédula',
+                'Empleado_Nombre': 'Nombre',
+                'Empleado_Apellido': 'Apellido',
+                'Empleado_Telefono': 'Teléfono',
+                'Empleado_SalarioBase': 'Salario Base',
+                'Empleado_Activo': 'Estado'
+            };
+            
+            function detectChanges() {
+                const changes = [];
+                
+                inputs.forEach(input => {
+                    const original = input.getAttribute('data-original');
+                    let current = input.value;
+                    
+                    // Para checkbox
+                    if (input.type === 'checkbox') {
+                        current = input.checked.toString();
+                    }
+                    
+                    if (original !== current) {
+                        const fieldName = fieldNames[input.name] || input.name;
+                        changes.push({
+                            field: fieldName,
+                            original: original,
+                            current: current
+                        });
+                        
+                        // Marcar campo como modificado
+                        if (input.type !== 'checkbox') {
+                            input.classList.add('modified');
+                        }
+                    } else {
+                        if (input.type !== 'checkbox') {
+                            input.classList.remove('modified');
+                        }
+                    }
+                });
+                
+                // Actualizar resumen de cambios
+                if (changes.length > 0) {
+                    changesSummary.classList.add('visible');
+                    let html = '';
+                    changes.forEach(change => {
+                        let oldValue = change.original;
+                        let newValue = change.current;
+                        
+                        // Formatear valores booleanos
+                        if (change.field === 'Estado') {
+                            oldValue = oldValue === 'true' ? 'Activo' : 'Inactivo';
+                            newValue = newValue === 'true' ? 'Activo' : 'Inactivo';
+                        }
+                        
+                        // Formatear salario
+                        if (change.field === 'Salario Base' && oldValue && newValue) {
+                            oldValue = parseFloat(oldValue).toLocaleString('es-DO', { style: 'currency', currency: 'DOP' });
+                            newValue = parseFloat(newValue).toLocaleString('es-DO', { style: 'currency', currency: 'DOP' });
+                        }
+                        
+                        html += `
+                            <div class="change-item">
+                                <span style="font-weight: 600; color: #374151;">${change.field}</span>
+                                <span>
+                                    <span class="change-old">${oldValue || '(vacío)'}</span>
+                                    <span class="change-arrow">→</span>
+                                    <span class="change-new">${newValue || '(vacío)'}</span>
+                                </span>
+                            </div>
+                        `;
+                    });
+                    changesList.innerHTML = html;
+                } else {
+                    changesSummary.classList.remove('visible');
+                }
+            }
+            
+            // Actualizar estado visual del checkbox
+            function actualizarEstado() {
+                if (checkActivo.checked) {
+                    statusDot.className = 'status-dot active';
+                    statusText.style.color = '#10b981';
+                    statusText.textContent = 'Activo';
+                } else {
+                    statusDot.className = 'status-dot inactive';
+                    statusText.style.color = '#6b7280';
+                    statusText.textContent = 'Inactivo';
+                }
+            }
+            
+            // Event listeners
+            inputs.forEach(input => {
+                input.addEventListener('input', detectChanges);
+                input.addEventListener('change', detectChanges);
+            });
+            
+            checkActivo.addEventListener('change', function() {
+                actualizarEstado();
+                detectChanges();
+            });
+            
+            // Detectar cambios iniciales
+            detectChanges();
+        });
+        
+        // Modal de eliminación
+        function confirmarEliminacion() {
+            document.getElementById('deleteModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function cerrarModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+        
+        document.getElementById('deleteModal').addEventListener('mousedown', function(e) {
+            if (e.target === this) cerrarModal();
+        });
+        
+        // Animación del modal
+        const styleEl = document.createElement('style');
+        styleEl.textContent = `@@keyframes slideUp { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }`;
+        document.head.appendChild(styleEl);
+    </script>
+}

@@ -5,47 +5,466 @@
     ViewData["Modulo"] = "RRHH";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="mb-0">Empleados</h5>
-    <a class="btn btn-sm btn-success" asp-page="Crear">+ Nuevo Empleado</a>
+<style>
+    :root {
+        --g-dark: #1a4332;
+        --g-bright: #10b981;
+        --g-light: #ecfdf5;
+        --danger: #be123c;
+        --border: #e5e7eb;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --bg: #f9fafb;
+    }
+
+    /* ── Toolbar ── */
+    .toolbar {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .search-wrap {
+        position: relative;
+        flex: 1;
+        min-width: 200px;
+    }
+    .search-wrap svg {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--muted);
+        pointer-events: none;
+    }
+    .search-wrap input {
+        width: 100%;
+        padding: 7px 12px 7px 34px;
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        font-size: 13px;
+        outline: none;
+        transition: border-color .15s, box-shadow .15s;
+    }
+    .search-wrap input:focus {
+        border-color: var(--g-bright);
+        box-shadow: 0 0 0 3px rgba(16,185,129,.1);
+    }
+    .toolbar select {
+        padding: 7px 10px;
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        font-size: 13px;
+        color: var(--text);
+        background: white;
+        cursor: pointer;
+        outline: none;
+    }
+    .toolbar select:focus {
+        border-color: var(--g-bright);
+        box-shadow: 0 0 0 3px rgba(16,185,129,.1);
+    }
+    .btn-nuevo {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--g-dark);
+        color: white;
+        border: none;
+        padding: 7px 16px;
+        border-radius: 7px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: background .15s, transform .1s;
+    }
+    .btn-nuevo:hover { background: #2d5a3d; color: white; transform: translateY(-1px); }
+
+    /* ── Bulk bar ── */
+    .bulk-bar {
+        display: none;
+        align-items: center;
+        gap: 10px;
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+        border-radius: 8px;
+        padding: 10px 16px;
+        margin-bottom: 12px;
+        font-size: 13px;
+        color: #92400e;
+    }
+    .bulk-bar.visible { display: flex; }
+    .btn-bulk-delete {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--danger);
+        color: white;
+        border: none;
+        padding: 5px 14px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background .15s;
+    }
+    .btn-bulk-delete:hover { background: #9f1239; }
+
+    /* ── Tabla ── */
+    .tabla-wrap {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .tabla-wrap table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+    .tabla-wrap thead th {
+        background: var(--bg);
+        padding: 10px 14px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        color: var(--muted);
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+        cursor: pointer;
+        user-select: none;
+    }
+    .tabla-wrap thead th:hover { color: var(--g-dark); }
+    .tabla-wrap thead th.sorted { color: var(--g-bright); }
+    .sort-arrow { font-size: 10px; margin-left: 3px; }
+    .tabla-wrap tbody tr {
+        border-bottom: 1px solid #f3f4f6;
+        transition: background .1s;
+    }
+    .tabla-wrap tbody tr:last-child { border-bottom: none; }
+    .tabla-wrap tbody tr:hover { background: #f0fdf4; }
+    .tabla-wrap tbody tr.selected { background: #ecfdf5; }
+    .tabla-wrap td {
+        padding: 10px 14px;
+        color: var(--text);
+        vertical-align: middle;
+    }
+    .cod { font-family: monospace; font-size: 11px; color: var(--muted); }
+    .nombre-bold { font-weight: 600; color: var(--g-dark); }
+    .badge-activo { background: #dcfce7; color: #166534; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+    .badge-inactivo { background: #fee2e2; color: #991b1b; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+
+    /* ── Acciones ── */
+    .acciones { display: flex; gap: 5px; white-space: nowrap; }
+    .btn-ac {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 4px 9px;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: opacity .15s, transform .1s;
+        border: none;
+        cursor: pointer;
+    }
+    .btn-ac:hover { opacity: .8; transform: translateY(-1px); }
+    .ac-edit { background: #e8f0fe; color: #1a56db; }
+    .ac-del  { background: #fde8e8; color: #c81e1e; }
+    .ac-ver  { background: #e8f5ef; color: #1e7a47; }
+
+    /* ── Empty state ── */
+    .empty-state {
+        text-align: center;
+        padding: 48px 20px;
+        color: var(--muted);
+    }
+    .empty-state svg { margin-bottom: 12px; opacity: .3; }
+    .empty-state p { font-size: 14px; margin: 0; }
+
+    /* ── Contador ── */
+    .result-count {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 8px;
+        padding-left: 2px;
+    }
+</style>
+
+<!-- Toolbar -->
+<div class="toolbar">
+    <!-- Buscador -->
+    <div class="search-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" id="buscador" placeholder="Buscar por nombre, cédula o teléfono..." autocomplete="off" />
+    </div>
+
+    <!-- Filtro estado -->
+    <select id="filtroEstado">
+        <option value="">Todos los estados</option>
+        <option value="activo">Activo</option>
+        <option value="inactivo">Inactivo</option>
+    </select>
+
+    <!-- Ordenar -->
+    <select id="ordenar">
+        <option value="">Ordenar por...</option>
+        <option value="nombre-asc">Nombre A→Z</option>
+        <option value="nombre-desc">Nombre Z→A</option>
+        <option value="salario-asc">Salario ↑</option>
+        <option value="salario-desc">Salario ↓</option>
+    </select>
+
+    <a class="btn-nuevo" asp-page="Crear">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Nuevo Empleado
+    </a>
 </div>
 
-<table class="table table-striped table-sm">
-    <thead>
-        <tr>
-            <th>Cédula</th>
-            <th>Nombre</th>
-            <th>Apellido</th>
-            <th>Teléfono</th>
-            <th>Salario Base</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var e in Model.Empleados)
-        {
-            <tr>
-                <td>@e.Cedula</td>
-                <td>@e.Nombre</td>
-                <td>@e.Apellido</td>
-                <td>@e.Telefono</td>
-                <td>@e.SalarioBase.ToString("C")</td>
-                <td>
-                    @if (e.Activo)
-                    {
-                        <span class="badge bg-success">Activo</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-secondary">Inactivo</span>
-                    }
-                </td>
-                <td>
-                    <a class="btn btn-secondary btn-sm" asp-page="Editar" asp-route-id="@e.Id">Editar</a>
-                    <a class="btn btn-danger btn-sm" asp-page="Borrar" asp-route-id="@e.Id">Eliminar</a>
-                </td>
-            </tr>
+<!-- Barra de selección múltiple -->
+<form method="post" asp-page-handler="BorrarSeleccion" id="formBulk">
+    <div class="bulk-bar" id="bulkBar">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+        </svg>
+        <span id="bulkCount">0</span> empleado(s) seleccionado(s)
+        <button type="submit" class="btn-bulk-delete" onclick="return confirm('¿Eliminar los empleados seleccionados?')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+            </svg>
+            Eliminar selección
+        </button>
+        <button type="button" class="btn-ac ac-edit" onclick="deseleccionarTodo()">Cancelar</button>
+    </div>
+
+    <!-- Contador -->
+    <div class="result-count" id="resultCount"></div>
+
+    <!-- Tabla -->
+    <div class="tabla-wrap">
+        <table id="tablaEmpleados">
+            <thead>
+                <tr>
+                    <th style="width:36px">
+                        <input type="checkbox" id="selectAll" title="Seleccionar todos" />
+                    </th>
+                    <th data-col="cedula">Identificación</th>
+                    <th data-col="nombre" class="sorted">Nombre Completo <span class="sort-arrow">↕</span></th>
+                    <th data-col="telefono">Contacto</th>
+                    <th data-col="salario">Salario Base <span class="sort-arrow">↕</span></th>
+                    <th data-col="estado">Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tbody">
+                @foreach (var e in Model.Empleados)
+                {
+                    <tr data-nombre="@($"{e.Nombre} {e.Apellido}".ToLower())"
+                        data-cedula="@(e.Cedula?.ToLower() ?? "")"
+                        data-telefono="@(e.Telefono?.ToLower() ?? "")"
+                        data-salario="@e.SalarioBase"
+                        data-estado="@(e.Activo ? "activo" : "inactivo")">
+                        <td>
+                            <input type="checkbox" name="ids" value="@e.Id" class="row-check" />
+                        </td>
+                        <td><span class="cod">@e.Cedula</span></td>
+                        <td><span class="nombre-bold">@e.Nombre @e.Apellido</span></td>
+                        <td>
+                            <svg width="12" height="12" fill="currentColor" class="me-1 text-muted" viewBox="0 0 16 16"><path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.568 17.568 0 0 0 4.168 6.608 17.569 17.569 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.678.678 0 0 0-.58-.122l-2.19.547a1.745 1.745 0 0 1-1.657-.459L5.482 8.062a1.745 1.745 0 0 1-.46-1.657l.548-2.19a.678.678 0 0 0-.122-.58L3.654 1.328z"/></svg>
+                            @e.Telefono
+                        </td>
+                        <td><strong>@e.SalarioBase.ToString("C")</strong></td>
+                        <td>
+                            @if (e.Activo)
+                            {
+                                <span class="badge-activo">Activo</span>
+                            }
+                            else
+                            {
+                                <span class="badge-inactivo">Inactivo</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="acciones">
+                                <a class="btn-ac ac-edit" asp-page="Editar" asp-route-id="@e.Id">
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                    Editar
+                                </a>
+                                <button type="button" class="btn-ac ac-del" onclick="eliminarEmpleado(@e.Id, '@Html.Raw($"{e.Nombre} {e.Apellido}".Replace("'", "\\'"))')">
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                                    Eliminar
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- Empty state -->
+        <div class="empty-state" id="emptyState" style="display:none">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+            <p>No se encontraron empleados con ese criterio.</p>
+        </div>
+    </div>
+</form>
+
+<!-- Modal eliminar individual desde tabla -->
+<div id="modalEliminar" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center;">
+    <div style="background:white;border-radius:14px;width:100%;max-width:400px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:slideUp .2s ease">
+        <div style="background:#be123c;padding:16px 20px;display:flex;align-items:center;gap:10px">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <div style="color:white;font-weight:700;font-size:14px">Confirmar eliminación</div>
+        </div>
+        <div style="padding:20px">
+            <p style="font-size:13px;color:#374151;margin:0 0 16px 0">
+                ¿Eliminar a <strong id="modalNombre"></strong>? Esta acción no se puede deshacer.
+            </p>
+            <div style="display:flex;gap:8px;justify-content:flex-end">
+                <button onclick="cerrarModalTabla()" style="background:white;border:1px solid #e5e7eb;color:#6b7280;padding:7px 16px;border-radius:7px;font-size:12px;cursor:pointer">
+                    Cancelar
+                </button>
+                <form method="post" asp-page-handler="Eliminar" id="formEliminar" style="margin:0">
+                    <input type="hidden" name="id" id="modalId" />
+                    <button type="submit" style="background:#be123c;color:white;border:none;padding:7px 16px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer">
+                        Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const filas = () => [...document.querySelectorAll('#tbody tr')];
+
+    // ── Filtrar y ordenar ──
+    function aplicar() {
+        const q       = document.getElementById('buscador').value.toLowerCase().trim();
+        const estado  = document.getElementById('filtroEstado').value;
+        const orden   = document.getElementById('ordenar').value;
+
+        let visibles = filas().filter(tr => {
+            const nombre   = tr.dataset.nombre;
+            const cedula   = tr.dataset.cedula;
+            const telefono = tr.dataset.telefono;
+            const trEstado = tr.dataset.estado;
+
+            const matchQ      = !q || nombre.includes(q) || cedula.includes(q) || telefono.includes(q);
+            const matchEstado = !estado || trEstado === estado;
+            return matchQ && matchEstado;
+        });
+
+        // Ocultar todas
+        filas().forEach(tr => tr.style.display = 'none');
+
+        // Ordenar
+        if (orden) {
+            const [campo, dir] = orden.split('-');
+            visibles.sort((a, b) => {
+                let va = campo === 'nombre'  ? a.dataset.nombre  :
+                         campo === 'salario'  ? parseFloat(a.dataset.salario) : 0;
+                let vb = campo === 'nombre'  ? b.dataset.nombre  :
+                         campo === 'salario'  ? parseFloat(b.dataset.salario) : 0;
+                if (typeof va === 'string') return dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+                return dir === 'asc' ? va - vb : vb - va;
+            });
+            const tbody = document.getElementById('tbody');
+            visibles.forEach(tr => tbody.appendChild(tr));
         }
-    </tbody>
-</table>
+
+        // Mostrar visibles
+        visibles.forEach(tr => tr.style.display = '');
+
+        // Empty state
+        document.getElementById('emptyState').style.display = visibles.length === 0 ? '' : 'none';
+
+        // Contador
+        const total = filas().length;
+        document.getElementById('resultCount').textContent =
+            visibles.length === total
+                ? `${total} empleado(s)`
+                : `Mostrando ${visibles.length} de ${total} empleado(s)`;
+    }
+
+    ['buscador','filtroEstado','ordenar'].forEach(id =>
+        document.getElementById(id).addEventListener('input', aplicar)
+    );
+
+    // ── Selección múltiple ──
+    function actualizarBulk() {
+        const checked = document.querySelectorAll('.row-check:checked').length;
+        const bar = document.getElementById('bulkBar');
+        bar.classList.toggle('visible', checked > 0);
+        document.getElementById('bulkCount').textContent = checked;
+
+        // Marcar filas seleccionadas
+        document.querySelectorAll('.row-check').forEach(cb => {
+            cb.closest('tr').classList.toggle('selected', cb.checked);
+        });
+    }
+
+    document.getElementById('selectAll').addEventListener('change', function() {
+        const visiblesChecks = [...document.querySelectorAll('#tbody tr')]
+            .filter(tr => tr.style.display !== 'none')
+            .map(tr => tr.querySelector('.row-check'));
+        visiblesChecks.forEach(cb => cb.checked = this.checked);
+        actualizarBulk();
+    });
+
+    document.querySelectorAll('.row-check').forEach(cb =>
+        cb.addEventListener('change', actualizarBulk)
+    );
+
+    function deseleccionarTodo() {
+        document.querySelectorAll('.row-check').forEach(cb => cb.checked = false);
+        document.getElementById('selectAll').checked = false;
+        actualizarBulk();
+    }
+
+    // Modal eliminar desde tabla
+    const modalEliminar = document.getElementById('modalEliminar');
+
+    function eliminarEmpleado(id, nombre) {
+        document.getElementById('modalNombre').textContent = nombre;
+        document.getElementById('modalId').value = id;
+        modalEliminar.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarModalTabla() {
+        modalEliminar.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    modalEliminar.addEventListener('mousedown', e => { if (e.target === modalEliminar) cerrarModalTabla(); });
+
+    const styleEl = document.createElement('style');
+    styleEl.textContent = `@@keyframes slideUp { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }`;
+    document.head.appendChild(styleEl);
+
+    // Inicializar contador
+    aplicar();
+</script>
+}
