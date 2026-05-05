@@ -219,10 +219,13 @@
 <body>
 
 <div class="sidebar">
-    <div class="sidebar-brand">
+    <!-- Reemplaza el sidebar-brand completo -->
+<div class="sidebar-brand">
+    <a asp-page="/Dashboard" style="text-decoration:none">
         <div class="brand-name">Origami Skin</div>
         <div class="brand-sub">Sistema de Gestión</div>
-    </div>
+    </a>
+</div>
 
     <nav class="sidebar-nav">
 
@@ -272,17 +275,25 @@
 
     <div class="sidebar-footer">
         <div class="sidebar-avatar">
-    @(Context.Session.GetString("NombreCompleto")?[0].ToString().ToUpper() ?? "?")
-</div>
-<div>
-    <div class="sidebar-user-name">
-        @Context.Session.GetString("NombreCompleto")
-    </div>
-    <div class="sidebar-user-role">
-        @Context.Session.GetString("Rol")
-    </div>
-</div>
-        <a class="sidebar-logout" asp-page="/Login">Salir</a>
+            @(Context.Session.GetString("NombreCompleto")?[0].ToString().ToUpper() ?? "?")
+        </div>
+        <div>
+            <div class="sidebar-user-name">
+                @Context.Session.GetString("NombreCompleto")
+            </div>
+            <div class="sidebar-user-role">
+                @Context.Session.GetString("Rol")
+            </div>
+        </div>
+                <!-- Reemplaza esta línea: -->
+        <a class="sidebar-logout" asp-page="/Logout">Salir</a>
+
+        <!-- Por este form: -->
+        <form method="post" asp-page="/Logout" style="margin:0">
+            <button type="submit" class="sidebar-logout" style="background:none;border:none;cursor:pointer;padding:0;">
+                Salir
+            </button>
+        </form>
     </div>
 </div>
 
