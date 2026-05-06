@@ -273,28 +273,28 @@
 
     </nav>
 
-    <div class="sidebar-footer">
-        <div class="sidebar-avatar">
-            @(Context.Session.GetString("NombreCompleto")?[0].ToString().ToUpper() ?? "?")
-        </div>
-        <div>
-            <div class="sidebar-user-name">
-                @Context.Session.GetString("NombreCompleto")
-            </div>
-            <div class="sidebar-user-role">
-                @Context.Session.GetString("Rol")
-            </div>
-        </div>
-                <!-- Reemplaza esta línea: -->
-        <a class="sidebar-logout" asp-page="/Logout">Salir</a>
-
-        <!-- Por este form: -->
-        <form method="post" asp-page="/Logout" style="margin:0">
-            <button type="submit" class="sidebar-logout" style="background:none;border:none;cursor:pointer;padding:0;">
-                Salir
-            </button>
-        </form>
+<div class="sidebar-footer">
+    <div class="sidebar-avatar">
+        @{
+            var nombreCompleto = Context.Session.GetString("NombreCompleto");
+            var inicial = !string.IsNullOrEmpty(nombreCompleto) ? nombreCompleto[0].ToString().ToUpper() : "?";
+        }
+        @inicial
     </div>
+    <div>
+        <div class="sidebar-user-name">
+            @(Context.Session.GetString("NombreCompleto") ?? "Usuario")
+        </div>
+        <div class="sidebar-user-role">
+            @(Context.Session.GetString("Rol") ?? "Sin rol")
+        </div>
+    </div>
+    <form method="post" asp-page="/Logout" style="margin:0;">
+        <button type="submit" style="background:none;border:none;cursor:pointer;color:rgba(168,213,181,0.35);font-size:11px;padding:0;">
+            Salir
+        </button>
+    </form>
+</div>
 </div>
 
 <div class="main-wrapper">

@@ -8,7 +8,10 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body style="background:#f0f4f2; min-height:100vh; display:flex; align-items:center; justify-content:center;">
-    @RenderBody()
+    <div style="width:100%; max-width:400px; padding: 20px;">
+        @RenderBody()
+    </div>
+    
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)

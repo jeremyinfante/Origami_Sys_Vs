@@ -84,6 +84,22 @@
     </div>
 </div>
 
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Exito"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
 <!-- Filtros y Ordenamiento -->
 <div class="toolbar">
     <div class="toolbar-row">
@@ -200,11 +216,11 @@
                     Cancelar
                 </button>
                 <form method="post" asp-page-handler="Eliminar" id="formEliminar" style="margin:0">
-                    <input type="hidden" name="id" id="modalId" />
-                    <button type="submit" style="background:#be123c;color:white;border:none;padding:7px 16px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer">
-                        Anular Venta
-                    </button>
-                </form>
+    <input type="hidden" name="id" id="modalId" />
+    <button type="submit" style="background:#be123c;color:white;border:none;padding:7px 16px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer">
+        Anular Venta
+    </button>
+</form>
             </div>
         </div>
     </div>

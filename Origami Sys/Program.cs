@@ -1,5 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Origami_Sys.Datos;
+// Agregar al inicio del archivo
+
+// Busca la línea donde agregas servicios y agrega:
+
 
 var builder = WebApplication.CreateBuilder(args);
 
